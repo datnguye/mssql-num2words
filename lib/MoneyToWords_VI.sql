@@ -1,6 +1,6 @@
 ﻿--======================================================
 -- Usage:	Lib: MoneyToWords in Vietnamese
--- Notes:	
+-- Notes:	Logic based on https://github.com/savoirfairelinux/num2words/blob/master/num2words/lang_VI.py
 -- History:
 -- Date			Author		Description
 -- 2020-08-31	DN			Intial
