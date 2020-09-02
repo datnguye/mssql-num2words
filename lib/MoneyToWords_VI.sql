@@ -1,6 +1,7 @@
 ﻿--======================================================
 -- Usage:	Lib: MoneyToWords in Vietnamese
--- Notes:	Logic based on https://github.com/savoirfairelinux/num2words/blob/master/num2words/lang_VI.py
+-- Notes:	It DOES NOT support negative number.
+--			Please concat 'negative word' into the result in that case
 -- History:
 -- Date			Author		Description
 -- 2020-08-31	DN			Intial
@@ -11,61 +12,86 @@ CREATE FUNCTION MoneyToWords_VI(@Number DECIMAL(17,2))
 RETURNS NVARCHAR(MAX)
 AS 
 BEGIN
-	DECLARE @Result		NVARCHAR(MAX) = N''
+	SET @Number = ABS(@Number)
+	DECLARE @vResult NVARCHAR(MAX) = N''
+
+	-- pre-data
 	DECLARE @tTo19		TABLE (Num int NOT NULL, Nam nvarchar(255) NOT NULL)
 	INSERT 
 	INTO	@tTo19 (Num, Nam)
-	VALUES	(0,N'không'),(1,N'một'),(2,N'hai'),(3,N'ba'),(4,N'bốn'),(5,N'năm'),(6,N'sáu'),(7,N'bảy'),(8,N'tám'),(9,N'chín'),
+	VALUES	(1,N'một'),(2,N'hai'),(3,N'ba'),(4,N'bốn'),(5,N'năm'),(6,N'sáu'),(7,N'bảy'),(8,N'tám'),(9,N'chín'),
 			(10,N'mười'),(11,N'mười một'),(12,N'mười hai'),(13,N'mười ba'),(14,N'mười bốn'),(15,N'mười lăm'),(16,N'mười sáu'),(17,N'mười bảy'),(18,N'mười tám'),(19,N'mười chín')
 	
-	DECLARE @FirstWord		nvarchar(255) = N'mốt'
-	DECLARE @OddWord		nvarchar(255) = N'lẻ'
-	DECLARE @TensWord		nvarchar(255) = N'mươi'
-	DECLARE @HundredWord	nvarchar(255) = N'trăm'
-	DECLARE @ThousandWord	nvarchar(255) = N'nghìn'
-	DECLARE @MillionWord	nvarchar(255) = N'triệu'
-	DECLARE @BillionWord	nvarchar(255) = N'tỷ'
-	DECLARE @DotWord		nvarchar(255) = N'phẩy'
+	DECLARE @ZeroWord		nvarchar(10) = N'không'
+	DECLARE @DotWord		nvarchar(10) = N'phẩy'
+	DECLARE @FirstWord		nvarchar(10) = N'mốt'
+	DECLARE @OddWord		nvarchar(10) = N'lẻ'
+	DECLARE @FifthWord		nvarchar(10) = N'lăm'
+	DECLARE @TensWord		nvarchar(10) = N'mươi'
+	DECLARE @HundredWord	nvarchar(10) = N'trăm'
+	DECLARE @ThousandWord	nvarchar(10) = N'nghìn'
+	DECLARE @MillionWord	nvarchar(10) = N'triệu'
+	DECLARE @BillionWord	nvarchar(10) = N'tỷ'
 
-	DECLARE @vMainNum DECIMAL(17,2) = FLOOR(@Number)
+	-- decimal number
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
 	DECLARE @vDecimalWords NVARCHAR(255)
-
 	IF @vDecimalNum <> 0
 		SET @vDecimalWords = dbo.MoneyToWords_VI(@vDecimalNum)
+		
+	-- main number
+	SET @Number = FLOOR(@Number)
+	IF @Number = 0
+		SET @vResult = @ZeroWord
+	ELSE
+	BEGIN
+		DECLARE @vSubResult	NVARCHAR(MAX) = N''
+		DECLARE @v000Num DECIMAL(15,0) = 0
+		DECLARE @v00Num DECIMAL(15,0) = 0
+		DECLARE @vIndex INT = 0
+		WHILE @Number > 0
+		BEGIN
+			-- from right to left: take first 000
+			SET @v000Num = @Number % 1000
+			SET @v00Num = @v000Num % 100
+			IF @v00Num < 20
+			BEGIN
+				-- less than 20
+				SELECT @vSubResult = Nam FROM @tTo19 WHERE Num = @v00Num
+				IF @vIndex = 0 AND @v00Num < 10 --odd
+					SET @vSubResult = FORMATMESSAGE('%s %s', @OddWord, @vSubResult)
+			END
+			ELSE
+			BEGIN
+				-- greater than or equal 20
+				SELECT @vSubResult = Nam FROM @tTo19 WHERE Num = CONVERT(INT,@v00Num / 10)
+				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, @TensWord)
+				SELECT @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE WHEN Num=5 THEN @FifthWord ELSE Nam END) FROM @tTo19 WHERE Num = CONVERT(INT,@v00Num % 10)
+			END
+			SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tTo19 WHERE Num = CONVERT(INT,@v000Num / 100)--000
+			SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
+																	WHEN @vIndex=1 THEN @ThousandWord
+																	WHEN @vIndex=2 THEN @MillionWord
+																	WHEN @vIndex=3 THEN @BillionWord
+																	WHEN @vIndex>3 THEN REPLICATE(@BillionWord,@vIndex-2)
+																	ELSE ''
+																END)
+			SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 
-	SET @Result = 'xxx' + COALESCE(' '+@DotWord+' '+@vDecimalWords, '')
-	/*
-		Convert_Integer_2text
-			If n < 100
-				convert number xx
-			Elif n < 1000
-				convert number xxx
-			Else
-				for (didx, dval) in ((v - 1, 1000 ** v) for v in range(len(denom))):
-				if dval > val:
-					mod = 1000 ** didx
-					lval = val // mod
-					r = val - (lval * mod)
+			-- next 000 (to left)
+			SET @vIndex = @vIndex + 1
+			SET @Number = FLOOR(@Number / 1000)
+		END
+	END
 
-					ret = self._convert_nnn(lval) + u' ' + denom[didx]
-					if 99 >= r > 0:
-						ret = self._convert_nnn(lval) + u' ' + denom[didx] + u' lẻ'
-					if r > 0:
-						ret = ret + ' ' + self.vietnam_number(r)
-					return ret
-
-		Main_func:
-			Use Convert_Integer_2text
-			Fragement by xxx then to call Convert_Integer_2text
-
-		Splitted by dot: first.sec
-		Result = Main_func(first) + phẩy + Main_func(sec)
-
-	*/
-
-    RETURN @Result
+	-- result
+	SET @vResult = TRIM(FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord+' '+@vDecimalWords, '')))
+    RETURN @vResult
 END
-/*
+/*	
 	SELECT dbo.MoneyToWords_VI(255.56)
+	SELECT dbo.MoneyToWords_VI(123456789.56)
+	SELECT dbo.MoneyToWords_VI(205.56)
+	SELECT dbo.MoneyToWords_VI(0.29)
+	SELECT dbo.MoneyToWords_VI(0.0)
 */
