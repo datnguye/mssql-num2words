@@ -72,8 +72,7 @@ BEGIN
 			SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																	WHEN @vIndex=1 THEN @ThousandWord
 																	WHEN @vIndex=2 THEN @MillionWord
-																	WHEN @vIndex=3 THEN @BillionWord
-																	WHEN @vIndex>3 THEN REPLICATE(@BillionWord,@vIndex-2)
+																	WHEN @vIndex>=3 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex-2))
 																	ELSE ''
 																END)
 			SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
