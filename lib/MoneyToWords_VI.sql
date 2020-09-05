@@ -16,28 +16,29 @@ BEGIN
 	DECLARE @vResult NVARCHAR(MAX) = N''
 
 	-- pre-data
-	DECLARE @tTo19		TABLE (Num int NOT NULL, Nam nvarchar(255) NOT NULL)
+	DECLARE @tTo19		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tTo19 (Num, Nam)
 	VALUES	(1,N'một'),(2,N'hai'),(3,N'ba'),(4,N'bốn'),(5,N'năm'),(6,N'sáu'),(7,N'bảy'),(8,N'tám'),(9,N'chín'),
 			(10,N'mười'),(11,N'mười một'),(12,N'mười hai'),(13,N'mười ba'),(14,N'mười bốn'),(15,N'mười lăm'),(16,N'mười sáu'),(17,N'mười bảy'),(18,N'mười tám'),(19,N'mười chín')
 	
-	DECLARE @ZeroWord		nvarchar(10) = N'không'
-	DECLARE @DotWord		nvarchar(10) = N'phẩy'
-	DECLARE @FirstWord		nvarchar(10) = N'mốt'
-	DECLARE @OddWord		nvarchar(10) = N'lẻ'
-	DECLARE @FifthWord		nvarchar(10) = N'lăm'
-	DECLARE @TensWord		nvarchar(10) = N'mươi'
-	DECLARE @HundredWord	nvarchar(10) = N'trăm'
-	DECLARE @ThousandWord	nvarchar(10) = N'nghìn'
-	DECLARE @MillionWord	nvarchar(10) = N'triệu'
-	DECLARE @BillionWord	nvarchar(10) = N'tỷ'
+	DECLARE @ZeroWord		NVARCHAR(10) = N'không'
+	DECLARE @DotWord		NVARCHAR(10) = N'phẩy'
+	DECLARE @FirstWord		NVARCHAR(10) = N'mốt'
+	DECLARE @OddWord		NVARCHAR(10) = N'lẻ'
+	DECLARE @FifthWord		NVARCHAR(10) = N'lăm'
+	DECLARE @TensWord		NVARCHAR(10) = N'mươi'
+	DECLARE @HundredWord	NVARCHAR(10) = N'trăm'
+	DECLARE @ThousandWord	NVARCHAR(10) = N'nghìn'
+	DECLARE @MillionWord	NVARCHAR(10) = N'triệu'
+	DECLARE @BillionWord	NVARCHAR(10) = N'tỷ'
 
 	-- decimal number
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
 	DECLARE @vDecimalWords NVARCHAR(255)
 	IF @vDecimalNum <> 0
 		SET @vDecimalWords = dbo.MoneyToWords_VI(@vDecimalNum)
+		IF @vDecimalNum < 10 SET @vDecimalWords = REPLACE(@vDecimalWords,@OddWord,@ZeroWord)
 		
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -48,7 +49,7 @@ BEGIN
 		DECLARE @vSubResult	NVARCHAR(MAX) = N''
 		DECLARE @v000Num DECIMAL(15,0) = 0
 		DECLARE @v00Num DECIMAL(15,0) = 0
-		DECLARE @vIndex INT = 0
+		DECLARE @vIndex SMALLINT = 0
 		WHILE @Number > 0
 		BEGIN
 			-- from right to left: take first 000
@@ -58,7 +59,7 @@ BEGIN
 			BEGIN
 				-- less than 20
 				SELECT @vSubResult = Nam FROM @tTo19 WHERE Num = @v00Num
-				IF @vIndex = 0 AND @v00Num < 10 --odd
+				IF @vIndex = 0 AND @v00Num < 10--odd
 					SET @vSubResult = FORMATMESSAGE('%s %s', @OddWord, @vSubResult)
 			END
 			ELSE
@@ -72,7 +73,10 @@ BEGIN
 			SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																	WHEN @vIndex=1 THEN @ThousandWord
 																	WHEN @vIndex=2 THEN @MillionWord
-																	WHEN @vIndex>=3 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex-2))
+																	WHEN @vIndex=3 THEN @BillionWord
+																	WHEN @vIndex>3 AND @vIndex%3=1 THEN @ThousandWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																	WHEN @vIndex>3 AND @vIndex%3=2 THEN @MillionWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																	WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
 																	ELSE ''
 																END)
 			SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
@@ -93,4 +97,7 @@ END
 	SELECT dbo.MoneyToWords_VI(205.56)
 	SELECT dbo.MoneyToWords_VI(0.29)
 	SELECT dbo.MoneyToWords_VI(0.0)
+	SELECT dbo.MoneyToWords_VI(1234567896789.02)--1 234 567 896 789.02
+	SELECT dbo.MoneyToWords_VI(1234567896789.52)--1 234 567 896 789.52
+	SELECT dbo.MoneyToWords_VI(123234567896789.02)--123 234 567 896 789.02
 */
