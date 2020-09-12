@@ -22,6 +22,7 @@ BEGIN
 END
 /*	
 	DECLARE @Lang char(2) = 'vi'
+
 	SELECT dbo.MoneyToWords(255.56, @Lang)
 	SELECT dbo.MoneyToWords(123456789.56, @Lang)
 	SELECT dbo.MoneyToWords(205.56, @Lang)
@@ -30,4 +31,5 @@ END
 	SELECT dbo.MoneyToWords(1234567896789.02, @Lang)--1 234 567 896 789.02
 	SELECT dbo.MoneyToWords(1234567896789.52, @Lang)--1 234 567 896 789.52
 	SELECT dbo.MoneyToWords(123234567896789.02, @Lang)--123 234 567 896 789.02
+	SELECT dbo.MoneyToWords(999999999999999.99, @Lang)--999 999 999 999 999.99
 */
