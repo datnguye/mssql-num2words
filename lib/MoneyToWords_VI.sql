@@ -107,6 +107,7 @@ END
 	SELECT dbo.MoneyToWords_VI(123004789.56)
 	SELECT dbo.MoneyToWords_VI(123904789.56)
 	SELECT dbo.MoneyToWords_VI(205.56)
+	SELECT dbo.MoneyToWords_VI(45.00)
 	SELECT dbo.MoneyToWords_VI(0.29)
 	SELECT dbo.MoneyToWords_VI(0.0)
 	SELECT dbo.MoneyToWords_VI(1234567896789.02)--1 234 567 896 789.02
