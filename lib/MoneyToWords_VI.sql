@@ -55,11 +55,15 @@ BEGIN
 			-- from right to left: take first 000
 			SET @v000Num = @Number % 1000
 			SET @v00Num = @v000Num % 100
-			IF @v00Num < 20
+			IF @v000Num = 0
+			BEGIN
+				SET @vSubResult = ''
+			END
+			ELSE IF @v00Num < 20
 			BEGIN
 				-- less than 20
 				SELECT @vSubResult = Nam FROM @tTo19 WHERE Num = @v00Num
-				IF @vIndex = 0 AND @v00Num < 10--odd
+				IF @v000Num >= 100 AND @v00Num < 10--odd
 					SET @vSubResult = FORMATMESSAGE('%s %s', @OddWord, @vSubResult)
 			END
 			ELSE
@@ -69,17 +73,21 @@ BEGIN
 				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, @TensWord)
 				SELECT @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE WHEN Num=5 THEN @FifthWord ELSE Nam END) FROM @tTo19 WHERE Num = CONVERT(INT,@v00Num % 10)
 			END
-			SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tTo19 WHERE Num = CONVERT(INT,@v000Num / 100)--000
-			SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																	WHEN @vIndex=1 THEN @ThousandWord
-																	WHEN @vIndex=2 THEN @MillionWord
-																	WHEN @vIndex=3 THEN @BillionWord
-																	WHEN @vIndex>3 AND @vIndex%3=1 THEN @ThousandWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
-																	WHEN @vIndex>3 AND @vIndex%3=2 THEN @MillionWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
-																	WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
-																	ELSE ''
-																END)
-			SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
+
+			IF @vSubResult <> ''
+			BEGIN
+				SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tTo19 WHERE Num = CONVERT(INT,@v000Num / 100)--000
+				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
+																		WHEN @vIndex=1 THEN @ThousandWord
+																		WHEN @vIndex=2 THEN @MillionWord
+																		WHEN @vIndex=3 THEN @BillionWord
+																		WHEN @vIndex>3 AND @vIndex%3=1 THEN @ThousandWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																		WHEN @vIndex>3 AND @vIndex%3=2 THEN @MillionWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																		ELSE ''
+																	END)
+				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
+			END
 
 			-- next 000 (to left)
 			SET @vIndex = @vIndex + 1
@@ -94,11 +102,15 @@ END
 /*	
 	SELECT dbo.MoneyToWords_VI(255.56)
 	SELECT dbo.MoneyToWords_VI(123456789.56)
+	SELECT dbo.MoneyToWords_VI(123000789.56)
+	SELECT dbo.MoneyToWords_VI(123010789.56)
+	SELECT dbo.MoneyToWords_VI(123004789.56)
+	SELECT dbo.MoneyToWords_VI(123904789.56)
 	SELECT dbo.MoneyToWords_VI(205.56)
 	SELECT dbo.MoneyToWords_VI(0.29)
 	SELECT dbo.MoneyToWords_VI(0.0)
 	SELECT dbo.MoneyToWords_VI(1234567896789.02)--1 234 567 896 789.02
 	SELECT dbo.MoneyToWords_VI(1234567896789.52)--1 234 567 896 789.52
 	SELECT dbo.MoneyToWords_VI(123234567896789.02)--123 234 567 896 789.02
-	SELECT dbo.MoneyToWords_VI(999999999999999.99)--999 999 999 999 999.99
+	SELECT dbo.MoneyToWords_VI(999999999999999.99)--999 999 999 999 999.99	
 */
