@@ -25,11 +25,12 @@ BEGIN
 	
 	DECLARE @ZeroWord		NVARCHAR(10) = 'zero'
 	DECLARE @DotWord		NVARCHAR(10) = 'point'
+	DECLARE @AndWord		NVARCHAR(10) = 'and'
 	DECLARE @HundredWord	NVARCHAR(10) = 'hundred'
 	DECLARE @ThousandWord	NVARCHAR(10) = 'thousand'
 	DECLARE @MillionWord	NVARCHAR(10) = 'million'
 	DECLARE @BillionWord	NVARCHAR(10) = 'billion'
-
+	DECLARE @TrillionWord	NVARCHAR(10) = 'trillion'
 	-- decimal number
 	
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
@@ -93,14 +94,19 @@ BEGIN
 				SET @vSubResult = @vSubResult + ' '+ @vSubResult_unit
 			END
 
-			IF @vSubResult <> ''
+			IF @vSubResult <> '' OR @v000Num != 0
 			BEGIN
-				SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @special WHERE Num = CONVERT(INT,@v000Num / 100)--000
+				IF @vSubResult <> ''
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s %s', Nam, @HundredWord, @AndWord, @vSubResult) FROM @special WHERE Num = CONVERT(INT,@v000Num / 100)--000
+
+				IF @v000Num != 0 and @vSubResult = ''
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @special WHERE Num = CONVERT(INT,@v000Num / 100)--000
+
 				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN @ThousandWord
 																		WHEN @vIndex=2 THEN @MillionWord
 																		WHEN @vIndex=3 THEN @BillionWord
-																		WHEN @vIndex>3 AND @vIndex%3=1 THEN @ThousandWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+																		WHEN @vIndex=4 THEN @TrillionWord
 																		WHEN @vIndex>3 AND @vIndex%3=2 THEN @MillionWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
 																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
 																		ELSE ''
@@ -119,6 +125,8 @@ BEGIN
 		SET @vResult = TRIM(FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord  +@vDecimalWords, '')))
 	ELSE
 		SET @vResult = TRIM(FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@vDecimalWords, '')))
+
+	SET @vResult =  REPLACE(@vResult,'ty ','ty-')
     RETURN @vResult
 END
 /*	
@@ -136,5 +144,5 @@ END
 	SELECT dbo.MoneyToWords_EN(1234567896789.52)--1 234 567 896 789.52
 	SELECT dbo.MoneyToWords_EN(123234567896789.02)--123 234 567 896 789.02
 	SELECT dbo.MoneyToWords_EN(999999999999999.99)--999 999 999 999 999.99	
-	SELECT dbo.MoneyToWords_EN(1001.1)
+	SELECT dbo.MoneyToWords_EN(100000000000000)
 */
