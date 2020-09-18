@@ -16,9 +16,9 @@ BEGIN
 	DECLARE @vResult NVARCHAR(MAX) = ''
 
 	-- pre-data
-	DECLARE @special		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
+	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
-	INTO	@special (Num, Nam)
+	INTO	@tDict (Num, Nam)
 	VALUES	(1,'one'),(2,'two'),(3,'three'),(4,'four'),(5,'five'),(6,'six'),(7,'seven'),(8,'eight'),(9,'nine'),
 			(10,'ten'),(11,'eleven'),(12,'twelve'),(13,'thirteen'),(14,'fourteen'),(15,'fifteen'),(16,'sixteen'),(17,'seventeen'),(18,'eighteen'),(19,'nineteen'),
 			(20,'twenty'),(30,'thirty'),(40,'fourty'),(50,'fifty'),(60,'sixty'),(70,'seventy'),(80,'eighty'),(90,'ninety')
@@ -31,28 +31,26 @@ BEGIN
 	DECLARE @MillionWord	NVARCHAR(10) = 'million'
 	DECLARE @BillionWord	NVARCHAR(10) = 'billion'
 	DECLARE @TrillionWord	NVARCHAR(10) = 'trillion'
-	-- decimal number
-	
-	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
-	DECLARE @vDecimalNum_tmp DECIMAL(17,2) = @vDecimalNum/10
-	DECLARE @vDecimalWords NVARCHAR(255) = '', @vDecimalWords_tmp NVARCHAR(255) = ''
 
-	IF @vDecimalNum <> 0
-		WHILE @vDecimalNum_tmp > 0
+	-- decimal number	
+	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
+	DECLARE @vLoop SMALLINT = CONVERT(SMALLINT, SQL_VARIANT_PROPERTY(@Number, 'Scale'))
+	DECLARE @vSubDecimalResult	NVARCHAR(MAX) = N''
+	IF @vDecimalNum > 0
+	BEGIN
+		WHILE @vLoop > 0
 		BEGIN
-			IF @vDecimalNum_tmp < 1
-				BEGIN
-				SET @vDecimalNum_tmp = @vDecimalNum_tmp *10
-				SET @vDecimalWords = ' '+ @ZeroWord
-				END
+			IF @vDecimalNum % 10 = 0
+				SET @vSubDecimalResult = FORMATMESSAGE('%s %s', @ZeroWord, @vSubDecimalResult)
 			ELSE
-				SET @vDecimalNum_tmp =  CONVERT(INT,@vDecimalNum_tmp)
+				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
+				FROM	@tDict
+				WHERE	Num = @vDecimalNum % 10
 
-			SET @vDecimalNum = (@vDecimalNum - @vDecimalNum_tmp*10)
-			SET @vDecimalWords_tmp = (SELECT Nam FROM @special WHERE Num = @vDecimalNum_tmp)
-			SET @vDecimalWords =  @vDecimalWords + ' '+  @vDecimalWords_tmp 
-			SET @vDecimalNum_tmp = @vDecimalNum--/10
+			SET @vDecimalNum = @vDecimalNum / 10
+			SET @vLoop = @vLoop - 1
 		END
+	END
 	
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -61,7 +59,6 @@ BEGIN
 	ELSE
 	BEGIN
 		DECLARE @vSubResult	NVARCHAR(MAX) = ''
-		DECLARE @vSubResult_unit NVARCHAR(MAX) = ''
 		DECLARE @v000Num DECIMAL(15,0) = 0
 		DECLARE @v00Num DECIMAL(15,0) = 0
 		DECLARE @v0Num DECIMAL(15,0) = 0
@@ -80,27 +77,23 @@ BEGIN
 			ELSE IF @v00Num < 20
 			BEGIN
 				-- less than 20
-				SELECT @vSubResult = Nam FROM @special WHERE Num = @v00Num
+				SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
 			END
 			ELSE 
 			BEGIN
 				-- greater than or equal 20
-				SELECT @vSubResult_unit = Nam FROM @special WHERE Num = @v0Num 
-
-				SET @v00Num = FLOOR(@v00Num/10)*10
-				
-				SELECT @vSubResult = Nam FROM @special WHERE Num = @v00Num 
-
-				SET @vSubResult = @vSubResult + ' '+ @vSubResult_unit
+				SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
+				SET @v00Num = FLOOR(@v00Num/10)*10				
+				SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
 			END
 
 			IF @vSubResult <> '' OR @v000Num != 0
 			BEGIN
 				IF @vSubResult <> ''
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s %s', Nam, @HundredWord, @AndWord, @vSubResult) FROM @special WHERE Num = CONVERT(INT,@v000Num / 100)--000
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s %s', Nam, @HundredWord, @AndWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)--000
 
 				IF @v000Num != 0 and @vSubResult = ''
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @special WHERE Num = CONVERT(INT,@v000Num / 100)--000
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)--000
 
 				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN @ThousandWord
@@ -120,17 +113,15 @@ BEGIN
 		END
 	END
 
+	SET @vResult = FORMATMESSAGE('%s %s', @vResult, COALESCE(@DotWord + ' ' + NULLIF(@vSubDecimalResult,''), ''))
+	
 	-- result
-	IF @vDecimalWords <>''
-		SET @vResult = TRIM(FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord  +@vDecimalWords, '')))
-	ELSE
-		SET @vResult = TRIM(FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@vDecimalWords, '')))
-
-	SET @vResult =  REPLACE(@vResult,'ty ','ty-')
     RETURN @vResult
 END
 /*	
+	SELECT dbo.MoneyToWords_EN(11001.255)
 	SELECT dbo.MoneyToWords_EN(11111.255)
+	SELECT dbo.MoneyToWords_EN(11111.04)
 	SELECT dbo.MoneyToWords_EN(123456789.56)
 	SELECT dbo.MoneyToWords_EN(123000789.56)
 	SELECT dbo.MoneyToWords_EN(123010789.56)
@@ -145,4 +136,5 @@ END
 	SELECT dbo.MoneyToWords_EN(123234567896789.02)--123 234 567 896 789.02
 	SELECT dbo.MoneyToWords_EN(999999999999999.99)--999 999 999 999 999.99	
 	SELECT dbo.MoneyToWords_EN(100000000000000)
+	SELECT dbo.MoneyToWords_EN(100000273.23)
 */
