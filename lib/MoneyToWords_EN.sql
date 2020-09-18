@@ -45,9 +45,9 @@ BEGIN
 			ELSE
 				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
 				FROM	@tDict
-				WHERE	Num = @vDecimalNum % 10
+				WHERE	Num = @vDecimalNum%10
 
-			SET @vDecimalNum = @vDecimalNum / 10
+			SET @vDecimalNum = FLOOR(@vDecimalNum/10)
 			SET @vLoop = @vLoop - 1
 		END
 	END
@@ -113,7 +113,7 @@ BEGIN
 		END
 	END
 
-	SET @vResult = FORMATMESSAGE('%s %s', @vResult, COALESCE(@DotWord + ' ' + NULLIF(@vSubDecimalResult,''), ''))
+	SET @vResult = FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord + ' ' + NULLIF(@vSubDecimalResult,''), ''))
 	
 	-- result
     RETURN @vResult
