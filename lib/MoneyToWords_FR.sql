@@ -51,15 +51,20 @@ BEGIN
 	--		When cents is followed by another number, it loses the s: deux cents but deux cent un
 	
 	--Decimal numbers
+	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
+	DECLARE @vLoop SMALLINT = CONVERT(SMALLINT, SQL_VARIANT_PROPERTY(@Number, 'Scale'))
 	DECLARE @vSubDecimalResult	NVARCHAR(MAX) = N''
-	IF (@Number - FLOOR(@Number)) > 0
+	IF @vDecimalNum > 0
 	BEGIN
-		SELECT	@vSubDecimalResult = Nam
-		FROM	@tTo19
-		WHERE	Num = FLOOR((@Number - FLOOR(@Number)) * 100 / 10)
-		SELECT	@vSubDecimalResult += ' ' + Nam
-		FROM	@tTo19
-		WHERE	Num = (@Number - FLOOR(@Number)) * 100 % 10
+		WHILE @vLoop > 0
+		BEGIN
+			SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
+			FROM	@tTo19
+			WHERE	Num = @vDecimalNum%10
+
+			SET @vDecimalNum = FLOOR(@vDecimalNum/10)
+			SET @vLoop = @vLoop - 1
+		END
 	END
 
 	--Main numbers
