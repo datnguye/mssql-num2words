@@ -82,7 +82,7 @@ BEGIN
 				BEGIN
 					-- less than 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
-					IF @v00Num < 10 AND @v00Num > 0 AND (@Number > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
+					IF @v00Num < 10 AND @v00Num > 0 AND (@v000Num > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
 						SET @vSubResult = FORMATMESSAGE('%s %s', @AndWord, @vSubResult)
 				END
 				ELSE 
@@ -94,7 +94,7 @@ BEGIN
 				END
 
 				--000
-				IF @Number > 99
+				IF @v000Num > 99
 					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
 			END
 			

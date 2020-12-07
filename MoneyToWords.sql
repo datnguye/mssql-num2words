@@ -13,7 +13,7 @@ RETURNS NVARCHAR(MAX)
 AS 
 BEGIN
 	RETURN CASE 
-		--WHEN LOWER(@Lang)='de' THEN dbo.MoneyToWords_DE(@Number)
+		WHEN LOWER(@Lang)='de' THEN dbo.MoneyToWords_DE(@Number)
 		WHEN LOWER(@Lang)='fr' THEN dbo.MoneyToWords_FR(@Number)
 		--WHEN LOWER(@Lang)='th' THEN dbo.MoneyToWords_TH(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
