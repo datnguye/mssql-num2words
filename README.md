@@ -1,55 +1,42 @@
 # mssql-num2words
-This is the TSQL container to help to convert money to words
+This is the TSQL container to help to convert money to words.
 
-#### Support Lanugages
-TBU
+#### Support Languages
+* German (DE)
+* English (EN)
+* French (FR)
+* Italian (IT)
+* Vietnamese (VI)
 
-#### Exmaples & Screenshot
-TBU
 
 #### Installaton
 TBU
 
 
-#### Develop
-TBU 
-
-
-
 #### Road map
-
-To support:
-+ English (EN)
-+ Vietnamese (VI)
-+ French (FR)
-+ Thai (TH)
-+ German (DE)
-
-...to be more on:
-ar (Arabic)
-cz (Czech)
-dk (Danish)
-es (Spanish)
-fi (Finnish)
-fr (French)
-he (Hebrew)
-hu (Hungarian)
-id (Indonesian)
-it (Italian)
-ja (Japanese)
-kn (Kannada)
-ko (Korean)
-kz (Kazakh)
-lt (Lithuanian)
-lv (Latvian)
-no (Norwegian)
-pl (Polish)
-pt (Portuguese)
-sl (Slovene)
-sr (Serbian)
-ro (Romanian)
-ru (Russian)
-te (Telugu)
-tr (Turkish)
-nl (Dutch)
-uk (Ukrainian)
+* Thai (TH)
+* Spanish (ES)
+* Japanese (JP)
+* Korean (KO)
+* Arabic (AR)
+* Czech (CZ)
+* Danish (DK)
+* Finnish (FI)
+* Hebrew (HE)
+* Hungarian (HU)
+* Indonesian (ID)
+* Kannada (KN)
+* Kazakh (KZ)
+* Lithuanian (LT)
+* Latvian (LV)
+* Norwegian (NO)
+* Polish (PL)
+* Portuguese (PT)
+* Slovene (SL)
+* Serbian (SR)
+* Romanian (RO)
+* Russian (RU)
+* Telugu (TE)
+* Turkish (TR)
+* Dutch (NL)
+* Ukrainian (UK)
