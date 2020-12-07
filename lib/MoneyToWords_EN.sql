@@ -5,6 +5,7 @@
 -- History:
 -- Date			Author		Description
 -- 2020-09-16	NV			Intial
+-- 2020-12-07	DN			Fix odd number
 --======================================================
 DROP FUNCTION IF EXISTS MoneyToWords_EN
 GO
@@ -74,26 +75,32 @@ BEGIN
 			BEGIN
 				SET @vSubResult = ''
 			END
-			ELSE IF @v00Num < 20
-			BEGIN
-				-- less than 20
-				SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
-			END
 			ELSE 
-			BEGIN
-				-- greater than or equal 20
-				SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-				SET @v00Num = FLOOR(@v00Num/10)*10				
-				SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
+			BEGIN 
+				--00
+				IF @v00Num < 20
+				BEGIN
+					-- less than 20
+					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
+					IF @v00Num < 10 AND @v00Num > 0 AND (@Number > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
+						SET @vSubResult = FORMATMESSAGE('%s %s', @AndWord, @vSubResult)
+				END
+				ELSE 
+				BEGIN
+					-- greater than or equal 20
+					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
+					SET @v00Num = FLOOR(@v00Num/10)*10
+					SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
+				END
+
+				--000
+				IF @Number > 99
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
 			END
-
-			IF @vSubResult <> '' OR @v000Num != 0
+			
+			--000xxx
+			IF @vSubResult <> ''
 			BEGIN
-				IF @vSubResult <> ''
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s %s', Nam, @HundredWord, @AndWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)--000
-
-				IF @v000Num != 0 and @vSubResult = ''
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)--000
 
 				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN @ThousandWord
@@ -104,6 +111,7 @@ BEGIN
 																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
 																		ELSE ''
 																	END)
+
 				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 			END
 
@@ -119,9 +127,7 @@ BEGIN
     RETURN @vResult
 END
 /*	
-	SELECT dbo.MoneyToWords_EN(11001.255)
-	SELECT dbo.MoneyToWords_EN(11111.255)
-	SELECT dbo.MoneyToWords_EN(11111.04)
+	SELECT dbo.MoneyToWords_EN(3201001.25)
 	SELECT dbo.MoneyToWords_EN(123456789.56)
 	SELECT dbo.MoneyToWords_EN(123000789.56)
 	SELECT dbo.MoneyToWords_EN(123010789.56)
@@ -136,5 +142,4 @@ END
 	SELECT dbo.MoneyToWords_EN(123234567896789.02)--123 234 567 896 789.02
 	SELECT dbo.MoneyToWords_EN(999999999999999.99)--999 999 999 999 999.99	
 	SELECT dbo.MoneyToWords_EN(100000000000000)
-	SELECT dbo.MoneyToWords_EN(100000273.23)
 */

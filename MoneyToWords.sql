@@ -17,19 +17,7 @@ BEGIN
 		WHEN LOWER(@Lang)='fr' THEN dbo.MoneyToWords_FR(@Number)
 		--WHEN LOWER(@Lang)='th' THEN dbo.MoneyToWords_TH(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
-		ELSE N'In development...'
+		ELSE 
+			 dbo.MoneyToWords_EN(@Number)
 	END		
 END
-/*	
-	DECLARE @Lang char(2) = 'fr'
-
-	SELECT dbo.MoneyToWords(255.56, @Lang)
-	SELECT dbo.MoneyToWords(123456789.56, @Lang)
-	SELECT dbo.MoneyToWords(205.56, @Lang)
-	SELECT dbo.MoneyToWords(0.29, @Lang)
-	SELECT dbo.MoneyToWords(0.0, @Lang)
-	SELECT dbo.MoneyToWords(1234567896789.02, @Lang)--1 234 567 896 789.02
-	SELECT dbo.MoneyToWords(1234567896789.52, @Lang)--1 234 567 896 789.52
-	SELECT dbo.MoneyToWords(123234567896789.02, @Lang)--123 234 567 896 789.02
-	SELECT dbo.MoneyToWords(999999999999999.99, @Lang)--999 999 999 999 999.99
-*/
