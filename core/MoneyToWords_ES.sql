@@ -23,21 +23,25 @@ BEGIN
 	INTO	@tDict (Num, Nam)
 	VALUES	(1,N'uno'),(2,N'dos'),(3,N'tres'),(4,N'cuatro'),(5,N'cinco'),(6,N'seis'),(7,N'siete'),(8,N'ocho'),(9,N'nueve'),
 			(10,N'diez'),(11,N'once'),(12,N'doce'),(13,N'trece'),(14,N'catorce'),(15,N'quince'),(16,N'dieciséis'),(17,N'diecisiete'),(18,N'dieciocho'),(19,N'diecinueve'),
-			(20,N'veinte'),(30,N'treinta'),(40,N'cuarenta'),(50,N'cincuenta'),(60,N'sesenta'),(70,N'setenta'),(80,N'ochenta'),(90,N'noventa')
+			(20,N'veinte'),(21,N'veintiuno'),(22,N'veintidós'),(23,N'veintitrés'),(24,N'veinticuatro'),(25,N'veinticinco'),(26,N'veintiséis'),(27,N'veintisiete'),(28,N'veintiocho'),(29,N'veintinueve'),
+			(30,N'treinta'),(40,N'cuarenta'),(50,N'cincuenta'),(60,N'sesenta'),(70,N'setenta'),(80,N'ochenta'),(90,N'noventa'),
+			(100,N'ciento'),(200,N'doscientos'),(300,N'trescientos'),(400,N'cuatrocientos'),(500,N'quinientos'),(600,N'seiscientos'),(700,N'setecientos'),(800,N'ochocientos'),(900,N'novecientos')
 	
-	DECLARE @ZeroWord		NVARCHAR(10) = N'cero'
-	DECLARE @DotWord		NVARCHAR(10) = N''
-	DECLARE @AndWord		NVARCHAR(10) = N'y'
-	DECLARE @HundredWord	NVARCHAR(10) = N'cien'
-	DECLARE @HundredWords	NVARCHAR(10) = N'cientos'
-	DECLARE @ThousandWord	NVARCHAR(10) = N'mil'
-	DECLARE @ThousandWords	NVARCHAR(10) = N'mil'
-	DECLARE @MillionWord	NVARCHAR(10) = N'millón'
-	DECLARE @MillionWords	NVARCHAR(10) = N'millones'
-	DECLARE @BillionWord	NVARCHAR(10) = N'mil millones'--N'millardo'
-	DECLARE @BillionWords	NVARCHAR(10) = N'mil millones'
-	DECLARE @TrillionWord	NVARCHAR(10) = N'billón'
-	DECLARE @TrillionWords	NVARCHAR(10) = N'billones'
+	DECLARE @ZeroWord			NVARCHAR(20) = N'cero'
+	DECLARE @DotWord			NVARCHAR(20) = N'punto'
+	DECLARE @AndWord			NVARCHAR(20) = N'y'
+	DECLARE @HundredWord		NVARCHAR(20) = N'ciento'
+	DECLARE @HundredWords		NVARCHAR(20) = N'cientos'
+	DECLARE @ThousandWord		NVARCHAR(20) = N'mil'
+	DECLARE @ThousandWords		NVARCHAR(20) = N'mil'
+	DECLARE @MillionWord		NVARCHAR(20) = N'millón'
+	DECLARE @MillionWords		NVARCHAR(20) = N'millones'
+	DECLARE @TrillionWord		NVARCHAR(20) = N'billón'
+	DECLARE @TrillionWords		NVARCHAR(20) = N'billones'
+	DECLARE @QuadrillionWord	NVARCHAR(20) = N'mil billones'
+	DECLARE @QuadrillionWords	NVARCHAR(20) = N'mil billones'
+	DECLARE @QuintillionWord	NVARCHAR(20) = N'trillón'
+	DECLARE @QuintillionWords	NVARCHAR(20) = N'trillones'
 
 	-- decimal number	
 	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
@@ -84,44 +88,47 @@ BEGIN
 			ELSE 
 			BEGIN 
 				--00
-				IF @v00Num < 20
+				IF @v00Num < 30
 				BEGIN
-					-- less than 20
-                    IF @v000Num = 1 AND @vIndex > 1 
-                        SET @vSubResult = N'eine'--Adding 'e' to 1 in case of million+
-                    ELSE
-					    SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
+					-- less than 30
+                    SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
 				END
 				ELSE 
 				BEGIN
-					-- greater than or equal 20
+					-- greater than or equal 30
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SET @v00Num = FLOOR(@v00Num/10)*10
-					SELECT @vSubResult = FORMATMESSAGE('%s%s%s', @vSubResult, @AndWord, Nam) FROM @tDict WHERE Num = @v00Num 
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @AndWord, @vSubResult) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10 
 				END
 
 				--000
-				IF @v000Num > 99
-					SELECT @vSubResult = FORMATMESSAGE('%s%s%s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
+				IF @v000Num = 100
+					SET @vSubResult = LEFT(@HundredWord,5)--removing "o" ending as 100 = cient but 101 = ciento uno
+				ELSE IF @v000Num > 100
+				BEGIN
+					SELECT	@vSubResult = FORMATMESSAGE('%s %s', (CASE WHEN Num > 1 THEN Nam ELSE '' END), @vSubResult) 
+					FROM	@tDict
+					WHERE	Num = FLOOR(@v000Num/100)*100
+				END
 			END
 			
-			--000xxx
-			IF @vSubResult <> ''
+			--000 xxx
+			IF @vSubResult <> '' 
 			BEGIN
-				SET @vSubResult = FORMATMESSAGE('%s%s', @vSubResult, CASE 
-																		WHEN @vIndex=1 THEN @ThousandWord
-																		WHEN @vIndex=2 THEN ' '+ @MillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END
-																		WHEN @vIndex=3 THEN ' '+ @BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END
-																		WHEN @vIndex=4 THEN ' '+ @TrillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END
-																		WHEN @vIndex>3 AND @vIndex%3=2 THEN ' '+ (@MillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END) + ' ' + TRIM(REPLICATE(@BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END + ' ',@vIndex%3))
-																		WHEN @vIndex>3 AND @vIndex%3=0 THEN ' '+ TRIM(REPLICATE(@BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END + ' ',@vIndex%3))
-																		ELSE ''
+				IF @v000Num = 1 AND @vIndex = 1 --No "number" in the front for 101 (ciento uno) and 1001 (mil uno)
+					SET @vSubResult = ''
+				IF @v000Num = 1 AND @vIndex >= 2--but 200 or 10 000 we do have as "doscientos" or "diez mil"
+					SET @vSubResult = 'un'--removing "o" ending of 1 = "uno"
+
+				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
+																		WHEN @vIndex=1 OR @vIndex=3 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
+																		WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
+																		WHEN @vIndex=4 THEN CASE WHEN @v000Num > 1 THEN @TrillionWords ELSE @TrillionWord END
+																		WHEN @vIndex=5 THEN CASE WHEN @v000Num > 1 THEN @QuadrillionWords ELSE @QuadrillionWord END
+																		WHEN @vIndex=6 THEN CASE WHEN @v000Num > 1 THEN @QuintillionWords ELSE @QuintillionWord END
+																		ELSE N''
 																	END)
 																	
-				IF @vIndex <= 1 AND FLOOR(@Number / 1000) > 0
-					SET @vResult = FORMATMESSAGE('%s%s', @vSubResult, @vResult)
-				ELSE
-					SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
+				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 			END
 
 			-- next 000 (to left)
