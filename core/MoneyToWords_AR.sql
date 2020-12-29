@@ -3,7 +3,7 @@
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
 -- References:
---
+-- https://www.fluentarabic.net/numbers-in-arabic/
 -- History:
 -- Date			Author		Description
 -- 2020-12-29	DN			Intial
