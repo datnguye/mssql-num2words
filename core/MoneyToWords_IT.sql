@@ -2,6 +2,8 @@
 -- Usage:	Lib: MoneyToWords in Italian
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
+-- References:
+-- https://www.italianpod101.com/blog/2019/10/24/italian-numbers/
 -- History:
 -- Date			Author		Description
 -- 2020-12-07	DN			Intial

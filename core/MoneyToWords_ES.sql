@@ -2,6 +2,8 @@
 -- Usage:	Lib: MoneyToWords in Spainish
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
+-- References:
+-- https://www.fluentin3months.com/spanish-numbers
 -- History:
 -- Date			Author		Description
 -- 2020-12-24	DN			Intial
@@ -19,18 +21,23 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N''),(2,N''),(3,N''),(4,N''),(5,N''),(6,N''),(7,N''),(8,N''),(9,N''),
-			(10,N''),(11,N''),(12,N''),(13,N''),(14,N''),(15,N''),(16,N''),(17,N''),(18,N''),(19,N''),
-			(20,N''),(30,N''),(40,N''),(50,N''),(60,N''),(70,N''),(80,N''),(90,N'')
+	VALUES	(1,N'uno'),(2,N'dos'),(3,N'tres'),(4,N'cuatro'),(5,N'cinco'),(6,N'seis'),(7,N'siete'),(8,N'ocho'),(9,N'nueve'),
+			(10,N'diez'),(11,N'once'),(12,N'doce'),(13,N'trece'),(14,N'catorce'),(15,N'quince'),(16,N'dieciséis'),(17,N'diecisiete'),(18,N'dieciocho'),(19,N'diecinueve'),
+			(20,N'veinte'),(30,N'treinta'),(40,N'cuarenta'),(50,N'cincuenta'),(60,N'sesenta'),(70,N'setenta'),(80,N'ochenta'),(90,N'noventa')
 	
-	DECLARE @ZeroWord		NVARCHAR(10) = N''
+	DECLARE @ZeroWord		NVARCHAR(10) = N'cero'
 	DECLARE @DotWord		NVARCHAR(10) = N''
-	DECLARE @AndWord		NVARCHAR(10) = N''
-	DECLARE @HundredWord	NVARCHAR(10) = N''
-	DECLARE @ThousandWord	NVARCHAR(10) = N''
-	DECLARE @MillionWord	NVARCHAR(10) = N''
-	DECLARE @BillionWord	NVARCHAR(10) = N''
-	DECLARE @TrillionWord	NVARCHAR(10) = N''
+	DECLARE @AndWord		NVARCHAR(10) = N'y'
+	DECLARE @HundredWord	NVARCHAR(10) = N'cien'
+	DECLARE @HundredWords	NVARCHAR(10) = N'cientos'
+	DECLARE @ThousandWord	NVARCHAR(10) = N'mil'
+	DECLARE @ThousandWords	NVARCHAR(10) = N'mil'
+	DECLARE @MillionWord	NVARCHAR(10) = N'millón'
+	DECLARE @MillionWords	NVARCHAR(10) = N'millones'
+	DECLARE @BillionWord	NVARCHAR(10) = N'mil millones'--N'millardo'
+	DECLARE @BillionWords	NVARCHAR(10) = N'mil millones'
+	DECLARE @TrillionWord	NVARCHAR(10) = N'billón'
+	DECLARE @TrillionWords	NVARCHAR(10) = N'billones'
 
 	-- decimal number	
 	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100

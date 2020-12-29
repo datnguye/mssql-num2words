@@ -2,6 +2,8 @@
 -- Usage:	Lib: MoneyToWords in Vietnamese
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
+-- References:
+-- https://yourvietnamese.com/learn-vietnamese/say-numbers-in-vietnamese/
 -- History:
 -- Date			Author		Description
 -- 2020-08-31	DN			Intial
