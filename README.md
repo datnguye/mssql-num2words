@@ -4,6 +4,7 @@ This is the TSQL container to help to convert money to words.
 #### Support Languages
 * German (DE)
 * English (EN)
+* Spanish (ES)
 * French (FR)
 * Italian (IT)
 * Vietnamese (VI)
@@ -15,7 +16,6 @@ TBU
 
 #### Road map
 * Thai (TH)
-* Spanish (ES)
 * Japanese (JP)
 * Korean (KO)
 * Arabic (AR)

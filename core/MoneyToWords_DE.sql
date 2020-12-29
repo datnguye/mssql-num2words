@@ -2,6 +2,8 @@
 -- Usage:	Lib: MoneyToWords in German
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
+-- References:
+-- https://www.fluentin3months.com/german-numbers/
 -- History:
 -- Date			Author		Description
 -- 2020-12-07	DN			Intial
