@@ -2,6 +2,7 @@
 This is the TSQL container to help to convert money to words.
 
 #### Support Languages
+* Arabic (AR)
 * German (DE)
 * English (EN)
 * Spanish (ES)
@@ -18,7 +19,6 @@ TBU
 * Thai (TH)
 * Japanese (JP)
 * Korean (KO)
-* Arabic (AR)
 * Czech (CZ)
 * Danish (DK)
 * Finnish (FI)
