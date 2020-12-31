@@ -32,9 +32,13 @@ BEGIN
 	DECLARE @AndWord		NVARCHAR(20) = N'و'
 	DECLARE @HundredWord	NVARCHAR(20) = N'مِئَة'
 	DECLARE @ThousandWord	NVARCHAR(20) = N'ألف'
-	DECLARE @MillionWord	NVARCHAR(20) = N''
-	DECLARE @BillionWord	NVARCHAR(20) = N''
-	DECLARE @TrillionWord	NVARCHAR(20) = N''
+	DECLARE @ThousandWords	NVARCHAR(20) = N'ألف'
+	DECLARE @MillionWord	NVARCHAR(20) = N'مليوناً'
+	DECLARE @MillionWords	NVARCHAR(20) = N'ملايين'
+	DECLARE @BillionWord	NVARCHAR(20) = N'ملياراً'
+	DECLARE @BillionWords	NVARCHAR(20) = N'ملياراً'
+	DECLARE @TrillionWord	NVARCHAR(20) = N'تريليون'
+	DECLARE @TrillionWords	NVARCHAR(20) = N'تريليون'
 
 	-- decimal number	
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
@@ -71,8 +75,6 @@ BEGIN
 				BEGIN
 					-- less than 20
                     SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
-					IF @v00Num < 10 AND @v00Num > 0 AND (@v000Num > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
-						SET @vSubResult = FORMATMESSAGE('%s %s', @AndWord, @vSubResult)
 				END
 				ELSE 
 				BEGIN
@@ -83,21 +85,22 @@ BEGIN
 
 				--000
 				IF @v000Num > 99
-					SELECT @vSubResult = FORMATMESSAGE('%s %s', (SELECT Nam FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)*100), @vSubResult) 
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', (SELECT Nam FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)*100), @AndWord, @vSubResult) 
 			END
 			
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				SET @vSubResult = FORMATMESSAGE('%s%s', @vSubResult, CASE 
-																		WHEN @vIndex=1 THEN @ThousandWord
-																		WHEN @vIndex=2 THEN ' '+ @MillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END
-																		WHEN @vIndex=3 THEN ' '+ @BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END
-																		WHEN @vIndex=4 THEN ' '+ @TrillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END
-																		WHEN @vIndex>3 AND @vIndex%3=2 THEN ' '+ (@MillionWord + CASE WHEN @v000Num > 1 THEN N'en' ELSE '' END) + ' ' + TRIM(REPLICATE(@BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END + ' ',@vIndex%3))
-																		WHEN @vIndex>3 AND @vIndex%3=0 THEN ' '+ TRIM(REPLICATE(@BillionWord + CASE WHEN @v000Num > 1 THEN N'n' ELSE '' END + ' ',@vIndex%3))
+				SET @vSubResult = FORMATMESSAGE('%s %s %s', @vSubResult, CASE 
+																		WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
+																		WHEN @vIndex=2 THEN ' '+ CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
+																		WHEN @vIndex=3 THEN ' '+ CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
+																		WHEN @vIndex=4 THEN ' '+ CASE WHEN @v000Num > 1 THEN @TrillionWords ELSE @TrillionWord END
+																		WHEN @vIndex>3 AND @vIndex%3=2 THEN ' '+ (CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END) + ' ' + TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
+																		WHEN @vIndex>3 AND @vIndex%3=0 THEN ' '+ TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
 																		ELSE ''
-																	END)
+																	END, 
+																	CASE WHEN @vIndex = 0 THEN '' ELSE @AndWord END)
 																	
 				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 			END
