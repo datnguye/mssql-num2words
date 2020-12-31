@@ -22,7 +22,7 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N'واحِد'),(2,N'إثْنان'),(3,N'ثَلاثة'),(4,N'أربعة'),(5,N'خمسة'),(6,N'سِتّة'),(7,N'سبعة'),(8,N'ثامنية'),(9,N'تعسة'),
+	VALUES	(1,N'واحِد'),(2,N'إثْنان'),(3,N'ثَلاثة'),(4,N'أربعة'),(5,N'خمسة'),(6,N'سِتّة'),(7,N'سبعة'),(8,N'ثامنية'),(9,N'تِسعة'),
 			(10,N'عشرة'),(11,N'أَحَدَ عَشَرَ'),(12,N'اِثْنَا عَشَرَ'),(13,N'ثَلَاثَةَ عَشَرَ'),(14,N'أَرْبَعَةَ عَشَرَ'),(15,N'خَمْسَةَ عَشَرَ'),(16,N'سِتَّةَ عَشَرَ'),(17,N'سَبْعَةَ عَشَرَ'),(18,N'ثَمَانِيَةَ عَشَرَ'),(19,N'تِسْعَةَ عَشَرَ'),
 			(20,N'عِشْرُونَ'),(30,N'ثَلَاثُونَ'),(40,N'أَرْبَعُونَ'),(50,N'خَمْسُونَ'),(60,N'سِتُّونَ'),(70,N'سَبْعُونَ'),(80,N'ثَمَانُونَ'),(90,N'تِسْعُونَ'),
 			(100,N'مِئة'),(200,N'مئتان'),(300,N'ثلاث مئة'),(400,N'أربع مئة'),(500,N'خمس مئة'),(600,N'ستّ مئة'),(700,N'سبع مئة'),(800,N'ثمان مئة'),(900,N'تسع مئة')
@@ -91,7 +91,7 @@ BEGIN
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				SET @vSubResult = FORMATMESSAGE('%s %s %s', @vSubResult, CASE 
+				SET @vSubResult = FORMATMESSAGE('%s %s%s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
 																		WHEN @vIndex=2 THEN ' '+ CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
 																		WHEN @vIndex=3 THEN ' '+ CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
@@ -100,7 +100,7 @@ BEGIN
 																		WHEN @vIndex>3 AND @vIndex%3=0 THEN ' '+ TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
 																		ELSE ''
 																	END, 
-																	CASE WHEN @vIndex = 0 THEN '' ELSE @AndWord END)
+																	CASE WHEN @vResult = '' THEN '' ELSE ' '+@AndWord END)
 																	
 				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 			END
@@ -117,8 +117,6 @@ BEGIN
     RETURN @vResult
 END
 /*	
-	SELECT dbo.MoneyToWords_AR(25.25)
-	SELECT dbo.MoneyToWords_AR(13.25)
 	SELECT dbo.MoneyToWords_AR(3201001.25)
 	SELECT dbo.MoneyToWords_AR(123456789.56)
 	SELECT dbo.MoneyToWords_AR(123000789.56)
