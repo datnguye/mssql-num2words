@@ -19,6 +19,7 @@ BEGIN
 		WHEN LOWER(@Lang)='fr' THEN dbo.MoneyToWords_FR(@Number)
 		--WHEN LOWER(@Lang)='th' THEN dbo.MoneyToWords_TH(@Number)
 		WHEN LOWER(@Lang)='it' THEN dbo.MoneyToWords_IT(@Number)
+		WHEN LOWER(@Lang)='ja' THEN dbo.MoneyToWords_JA(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
 		ELSE dbo.MoneyToWords_EN(@Number)
 	END		

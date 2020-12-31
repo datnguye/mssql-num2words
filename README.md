@@ -8,6 +8,7 @@ This is the TSQL container to help to convert money to words.
 * Spanish (ES)
 * French (FR)
 * Italian (IT)
+* Japanese (JA)
 * Vietnamese (VI)
 
 
@@ -17,7 +18,6 @@ TBU
 
 #### Road map
 * Thai (TH)
-* Japanese (JP)
 * Korean (KO)
 * Czech (CZ)
 * Danish (DK)
