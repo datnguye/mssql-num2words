@@ -1,9 +1,10 @@
---======================================================
+﻿--======================================================
 -- Usage:	Lib: MoneyToWords in Arabic
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
 -- References:
--- https://www.fluentarabic.net/numbers-in-arabic/
+-- https://wordadayarabic.com/2013/03/04/arabic-numbers-0-10/
+-- https://wordadayarabic.com/2015/05/23/arabic-numbers-iii-11-1000/
 -- History:
 -- Date			Author		Description
 -- 2020-12-29	DN			Intial
@@ -21,38 +22,25 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N''),(2,N''),(3,N''),(4,N''),(5,N''),(6,N''),(7,N''),(8,N''),(9,N''),
-			(10,N''),(11,N''),(12,N''),(13,N''),(14,N''),(15,N''),(16,N''),(17,N''),(18,N''),(19,N''),
-			(20,N''),(30,N''),(40,N''),(50,N''),(60,N''),(70,N''),(80,N''),(90,N'')
+	VALUES	(1,N'واحِد'),(2,N'إثْنان'),(3,N'ثَلاثة'),(4,N'أربعة'),(5,N'خمسة'),(6,N'سِتّة'),(7,N'سبعة'),(8,N'ثامنية'),(9,N'تعسة'),
+			(10,N'عشرة'),(11,N'أَحَدَ عَشَرَ'),(12,N'اِثْنَا عَشَرَ'),(13,N'ثَلَاثَةَ عَشَرَ'),(14,N'أَرْبَعَةَ عَشَرَ'),(15,N'خَمْسَةَ عَشَرَ'),(16,N'سِتَّةَ عَشَرَ'),(17,N'سَبْعَةَ عَشَرَ'),(18,N'ثَمَانِيَةَ عَشَرَ'),(19,N'تِسْعَةَ عَشَرَ'),
+			(20,N'عِشْرُونَ'),(30,N'ثَلَاثُونَ'),(40,N'أَرْبَعُونَ'),(50,N'خَمْسُونَ'),(60,N'سِتُّونَ'),(70,N'سَبْعُونَ'),(80,N'ثَمَانُونَ'),(90,N'تِسْعُونَ'),
+			(100,N'مِئة'),(200,N'مئتان'),(300,N'ثلاث مئة'),(400,N'أربع مئة'),(500,N'خمس مئة'),(600,N'ستّ مئة'),(700,N'سبع مئة'),(800,N'ثمان مئة'),(900,N'تسع مئة')
 	
-	DECLARE @ZeroWord		NVARCHAR(10) = N''
-	DECLARE @DotWord		NVARCHAR(10) = N''
-	DECLARE @AndWord		NVARCHAR(10) = N''
-	DECLARE @HundredWord	NVARCHAR(10) = N''
-	DECLARE @ThousandWord	NVARCHAR(10) = N''
-	DECLARE @MillionWord	NVARCHAR(10) = N''
-	DECLARE @BillionWord	NVARCHAR(10) = N''
-	DECLARE @TrillionWord	NVARCHAR(10) = N''
+	DECLARE @ZeroWord		NVARCHAR(20) = N'صفر'
+	DECLARE @DotWord		NVARCHAR(20) = N','
+	DECLARE @AndWord		NVARCHAR(20) = N'و'
+	DECLARE @HundredWord	NVARCHAR(20) = N'مِئَة'
+	DECLARE @ThousandWord	NVARCHAR(20) = N'ألف'
+	DECLARE @MillionWord	NVARCHAR(20) = N''
+	DECLARE @BillionWord	NVARCHAR(20) = N''
+	DECLARE @TrillionWord	NVARCHAR(20) = N''
 
 	-- decimal number	
-	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
-	DECLARE @vLoop SMALLINT = CONVERT(SMALLINT, SQL_VARIANT_PROPERTY(@Number, 'Scale'))
-	DECLARE @vSubDecimalResult	NVARCHAR(MAX) = N''
-	IF @vDecimalNum > 0
-	BEGIN
-		WHILE @vLoop > 0
-		BEGIN
-			IF @vDecimalNum % 10 = 0
-				SET @vSubDecimalResult = FORMATMESSAGE('%s %s', @ZeroWord, @vSubDecimalResult)
-			ELSE
-				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
-				FROM	@tDict
-				WHERE	Num = @vDecimalNum%10
-
-			SET @vDecimalNum = FLOOR(@vDecimalNum/10)
-			SET @vLoop = @vLoop - 1
-		END
-	END
+	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
+	DECLARE @vSubDecimalResult NVARCHAR(255)
+	IF @vDecimalNum <> 0
+		SET @vSubDecimalResult = dbo.MoneyToWords_AR(@vDecimalNum)
 	
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -82,22 +70,20 @@ BEGIN
 				IF @v00Num < 20
 				BEGIN
 					-- less than 20
-                    IF @v000Num = 1 AND @vIndex > 1 
-                        SET @vSubResult = N'eine'--Adding 'e' to 1 in case of million+
-                    ELSE
-					    SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
+                    SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
+					IF @v00Num < 10 AND @v00Num > 0 AND (@v000Num > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
+						SET @vSubResult = FORMATMESSAGE('%s %s', @AndWord, @vSubResult)
 				END
 				ELSE 
 				BEGIN
 					-- greater than or equal 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SET @v00Num = FLOOR(@v00Num/10)*10
-					SELECT @vSubResult = FORMATMESSAGE('%s%s%s', @vSubResult, @AndWord, Nam) FROM @tDict WHERE Num = @v00Num 
+					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', @vSubResult, @AndWord, Nam) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10 
 				END
 
 				--000
 				IF @v000Num > 99
-					SELECT @vSubResult = FORMATMESSAGE('%s%s%s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
+					SELECT @vSubResult = FORMATMESSAGE('%s %s', (SELECT Nam FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)*100), @vSubResult) 
 			END
 			
 			--000xxx
@@ -113,10 +99,7 @@ BEGIN
 																		ELSE ''
 																	END)
 																	
-				IF @vIndex <= 1 AND FLOOR(@Number / 1000) > 0
-					SET @vResult = FORMATMESSAGE('%s%s', @vSubResult, @vResult)
-				ELSE
-					SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
+				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
 			END
 
 			-- next 000 (to left)
@@ -131,6 +114,8 @@ BEGIN
     RETURN @vResult
 END
 /*	
+	SELECT dbo.MoneyToWords_AR(25.25)
+	SELECT dbo.MoneyToWords_AR(13.25)
 	SELECT dbo.MoneyToWords_AR(3201001.25)
 	SELECT dbo.MoneyToWords_AR(123456789.56)
 	SELECT dbo.MoneyToWords_AR(123000789.56)
