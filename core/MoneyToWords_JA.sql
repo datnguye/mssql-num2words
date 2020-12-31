@@ -3,6 +3,8 @@
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
 -- History:
+-- References:
+-- https://www.fluentin3months.com/japanese-numbers/
 -- Date			Author		Description
 -- 2020-12-31	NV			Intial
 --======================================================
