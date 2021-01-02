@@ -7,9 +7,10 @@ This is the TSQL container to help to convert money to words.
 * English (EN)
 * Spanish (ES)
 * French (FR)
-* Korean (KO)
 * Italian (IT)
 * Japanese (JA)
+* Korean (KO)
+* Portuguese (PT)
 * Thai (TH) - In developing...
 * Vietnamese (VI)
 
@@ -31,7 +32,6 @@ TBU
 * Latvian (LV)
 * Norwegian (NO)
 * Polish (PL)
-* Portuguese (PT)
 * Slovene (SL)
 * Serbian (SR)
 * Romanian (RO)
