@@ -23,6 +23,7 @@ BEGIN
 		WHEN LOWER(@Lang)='ko' THEN dbo.MoneyToWords_KO(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PL(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PT(@Number)
+		WHEN LOWER(@Lang)='tr' THEN dbo.MoneyToWords_TR(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
 		ELSE dbo.MoneyToWords_EN(@Number)
 	END		
