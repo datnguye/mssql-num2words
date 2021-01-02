@@ -1,5 +1,5 @@
---======================================================
--- Usage:	Lib: MoneyToWords in Japanese
+﻿--======================================================
+-- Usage:	Lib: MoneyToWords in Japanese (in Kanji)
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
 -- History:
@@ -21,18 +21,18 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,''),(2,''),(3,''),(4,''),(5,''),(6,''),(7,''),(8,''),(9,''),
-			(10,''),(11,''),(12,''),(13,''),(14,''),(15,''),(16,''),(17,''),(18,''),(19,''),
-			(20,''),(30,''),(40,''),(50,''),(60,''),(70,''),(80,''),(90,'')
+	VALUES	(1,N'一'),(2,N'二'),(3,N'三'),(4,N'四'),(5,N'五'),(6,N'六'),(7,N'七'),(8,N'八'),(9,N'九'),(10,N'十'),
+			(0,N'')
 	
-	DECLARE @ZeroWord		NVARCHAR(10) = 'zero'
-	DECLARE @DotWord		NVARCHAR(10) = 'point'
-	DECLARE @AndWord		NVARCHAR(10) = 'and'
-	DECLARE @HundredWord	NVARCHAR(10) = 'hundred'
-	DECLARE @ThousandWord	NVARCHAR(10) = 'thousand'
-	DECLARE @MillionWord	NVARCHAR(10) = 'million'
-	DECLARE @BillionWord	NVARCHAR(10) = 'billion'
-	DECLARE @TrillionWord	NVARCHAR(10) = 'trillion'
+	DECLARE @ZeroWord				NVARCHAR(10) = N'零'
+	DECLARE @DotWord				NVARCHAR(10) = N'点'
+	DECLARE @AndWord				NVARCHAR(10) = N''
+	DECLARE @TenWord				NVARCHAR(10) = N'十'
+	DECLARE @HundredWord			NVARCHAR(10) = N'百'
+	DECLARE @ThousandWord			NVARCHAR(10) = N'千'
+	DECLARE @ManWord				NVARCHAR(10) = N'万'--man (1 0000)
+	DECLARE @DoubleManWord			NVARCHAR(10) = N'億'--ichioku (1 0000 0000)
+	DECLARE @ChoWord				NVARCHAR(10) = N'兆'--icchou (1 0000 0000 0000)
 
 	-- decimal number	
 	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
@@ -43,9 +43,9 @@ BEGIN
 		WHILE @vLoop > 0
 		BEGIN
 			IF @vDecimalNum % 10 = 0
-				SET @vSubDecimalResult = FORMATMESSAGE('%s %s', @ZeroWord, @vSubDecimalResult)
+				SET @vSubDecimalResult = FORMATMESSAGE(N'%s%s', @ZeroWord, @vSubDecimalResult)
 			ELSE
-				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
+				SELECT	@vSubDecimalResult = FORMATMESSAGE(N'%s%s', Nam, @vSubDecimalResult)
 				FROM	@tDict
 				WHERE	Num = @vDecimalNum%10
 
@@ -61,6 +61,7 @@ BEGIN
 	ELSE
 	BEGIN
 		DECLARE @vSubResult	NVARCHAR(MAX) = ''
+		DECLARE @v0000Num DECIMAL(15,0) = 0
 		DECLARE @v000Num DECIMAL(15,0) = 0
 		DECLARE @v00Num DECIMAL(15,0) = 0
 		DECLARE @v0Num DECIMAL(15,0) = 0
@@ -68,61 +69,64 @@ BEGIN
 		
 		WHILE @Number > 0
 		BEGIN
-			-- from right to left: take first 000
-			SET @v000Num = @Number % 1000
+			-- from right to left: take first 0000
+			SET @v0000Num = @Number % 10000
+			SET @v000Num = @v0000Num % 1000
 			SET @v00Num = @v000Num % 100
 			SET @v0Num = @v00Num % 10
-			IF @v000Num = 0
+			IF @v0000Num = 0
 			BEGIN
-				SET @vSubResult = ''
+				SET @vSubResult = N''
 			END
 			ELSE 
 			BEGIN 
 				--00
-				IF @v00Num < 20
+				IF @v00Num <= 10
 				BEGIN
-					-- less than 20
+					-- less than or equal 10
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
-					IF @v00Num < 10 AND @v00Num > 0 AND (@v000Num > 99 OR FLOOR(@Number / 1000) > 0)--e.g 1 001: 1000 AND 1; or 201 000: (200 AND 1) 000
-						SET @vSubResult = FORMATMESSAGE('%s %s', @AndWord, @vSubResult)
 				END
 				ELSE 
 				BEGIN
-					-- greater than or equal 20
+					-- greater than 10
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SET @v00Num = FLOOR(@v00Num/10)*10
-					SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
+					SELECT @vSubResult = FORMATMESSAGE(N'%s%s%s', Nam, @TenWord, @vSubResult) FROM @tDict WHERE Num = FLOOR(@v00Num/10)
 				END
 
 				--000
-				IF @v000Num > 99
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', Nam, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
+				IF @v000Num = 100
+					SET @vSubResult = @HundredWord
+				ELSE IF @v000Num > 100
+					SELECT @vSubResult = FORMATMESSAGE(N'%s%s%s', CASE WHEN Num > 1 THEN Nam ELSE '' END, @HundredWord, @vSubResult) FROM @tDict WHERE Num = FLOOR(@v000Num/100)
+
+				--0000
+				IF @v0000Num = 1000
+					SET @vSubResult = @ThousandWord
+				ELSE IF @v0000Num > 1000
+					SELECT @vSubResult = FORMATMESSAGE(N'%s%s%s', CASE WHEN Num > 1 THEN Nam ELSE '' END, @ThousandWord, @vSubResult) FROM @tDict WHERE Num = FLOOR(@v0000Num/1000)
 			END
 			
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
 
-				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																		WHEN @vIndex=1 THEN @ThousandWord
-																		WHEN @vIndex=2 THEN @MillionWord
-																		WHEN @vIndex=3 THEN @BillionWord
-																		WHEN @vIndex=4 THEN @TrillionWord
-																		WHEN @vIndex>3 AND @vIndex%3=2 THEN @MillionWord + ' ' + TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
-																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE(@BillionWord + ' ',@vIndex%3))
+				SET @vSubResult = FORMATMESSAGE(N'%s%s', @vSubResult, CASE 
+																		WHEN @vIndex=1 THEN @ManWord
+																		WHEN @vIndex=2 THEN @DoubleManWord
+																		WHEN @vIndex=3 THEN @ChoWord
 																		ELSE ''
 																	END)
 
-				SET @vResult = FORMATMESSAGE('%s %s', @vSubResult, @vResult)
+				SET @vResult = FORMATMESSAGE(N'%s%s', @vSubResult, @vResult)
 			END
 
 			-- next 000 (to left)
 			SET @vIndex = @vIndex + 1
-			SET @Number = FLOOR(@Number / 1000)
+			SET @Number = FLOOR(@Number / 10000)
 		END
 	END
 
-	SET @vResult = FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord + ' ' + NULLIF(@vSubDecimalResult,''), ''))
+	SET @vResult = FORMATMESSAGE(N'%s%s', TRIM(@vResult), COALESCE(@DotWord + NULLIF(@vSubDecimalResult,N''), N''))
 	
 	-- result
     RETURN @vResult
