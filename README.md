@@ -2,13 +2,15 @@
 This is the TSQL container to help to convert money to words.
 
 #### Support Languages
-* Arabic (AR) - need more testing
+* Arabic (AR) - NOT 100% accurated
 * German (DE)
 * English (EN)
 * Spanish (ES)
 * French (FR)
+* Korean (KO)
 * Italian (IT)
 * Japanese (JA)
+* Thai (TH) - In developing...
 * Vietnamese (VI)
 
 
@@ -17,8 +19,6 @@ TBU
 
 
 #### Road map
-* Thai (TH)
-* Korean (KO)
 * Czech (CZ)
 * Danish (DK)
 * Finnish (FI)
