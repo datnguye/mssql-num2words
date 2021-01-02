@@ -10,6 +10,7 @@ This is the TSQL container to help to convert money to words.
 * Italian (IT)
 * Japanese (JA)
 * Korean (KO)
+* Polish (PL)
 * Portuguese (PT)
 * Thai (TH) - In developing...
 * Vietnamese (VI)
@@ -31,7 +32,6 @@ TBU
 * Lithuanian (LT)
 * Latvian (LV)
 * Norwegian (NO)
-* Polish (PL)
 * Slovene (SL)
 * Serbian (SR)
 * Romanian (RO)
