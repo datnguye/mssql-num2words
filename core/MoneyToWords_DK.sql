@@ -6,7 +6,7 @@
 -- https://www.languagesandnumbers.com/how-to-count-in-danish/en/dan/
 -- History:
 -- Date			Author		Description
--- 2021-01-01	DN			Intial
+-- 2021-01-02	DN			Intial
 --======================================================
 DROP FUNCTION IF EXISTS MoneyToWords_DK
 GO
@@ -21,27 +21,43 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N'bir'),(2,N'iki'),(3,N'üç'),(4,N'dört'),(5,N'beş'),(6,N'altı'),(7,N'yedi'),(8,N'sekiz'),(9,N'dokuz'),
-			(10,N'on'),(20,N'yirmi'),(30,N'otuz'),(40,N'kırk'),(50,N'elli'),(60,N'altmış'),(70,N'yetmiş'),(80,N'seksen'),(90,N'doksan')
+	VALUES	(1,N'en'),(2,N'to'),(3,N'tre'),(4,N'fire'),(5,N'fem'),(6,N'seks'),(7,N'syv'),(8,N'otte'),(9,N'ni'),
+			(11,N'elleve'),(12,N'tolv'),(13,N'tretten'),(14,N'fjorten'),(15,N'femten'),(16,N'seksten'),(17,N'sytten'),(18,N'atten'),(19,N'nitten'),
+			(10,N'ti'),(20,N'tyve'),(30,N'tredive'),(40,N'fyrre'),(50,N'halvtreds'),(60,N'tres'),(70,N'halvfjerds'),(80,N'firs'),(90,N'halvfems')
 
-	DECLARE @ZeroWord		NVARCHAR(20) = N'sıfır'
-	DECLARE @DotWord		NVARCHAR(20) = N'virgül'
-	DECLARE @AndWord		NVARCHAR(20) = N'e'
-	DECLARE @HundredWord	NVARCHAR(20) = N'yüz'
-	DECLARE @ThousandWord	NVARCHAR(20) = N'bin'
-	DECLARE @ThousandWords	NVARCHAR(20) = N'bin'
-	DECLARE @MillionWord	NVARCHAR(20) = N'milyon'
-	DECLARE @MillionWords	NVARCHAR(20) = N'milyon'
-	DECLARE @BillionWord	NVARCHAR(20) = N'milyar'
-	DECLARE @BillionWords	NVARCHAR(20) = N'milyar'
-	DECLARE @TrillionWord	NVARCHAR(20) = N'trilyon'
-	DECLARE @TrillionWords	NVARCHAR(20) = N'trilyon'
+	DECLARE @ZeroWord		NVARCHAR(20) = N'nul'
+	DECLARE @DotWord		NVARCHAR(20) = N'komma'
+	DECLARE @AndWord		NVARCHAR(20) = N'og'
+	DECLARE @HundredWord	NVARCHAR(20) = N'hundred'
+	DECLARE @HundredWords	NVARCHAR(20) = N'hundrede'
+	DECLARE @ThousandWord	NVARCHAR(20) = N'tusind'
+	DECLARE @ThousandWords	NVARCHAR(20) = N'tusinde'
+	DECLARE @MillionWord	NVARCHAR(20) = N'million'
+	DECLARE @MillionWords	NVARCHAR(20) = N'millioner'
+	DECLARE @BillionWord	NVARCHAR(20) = N'milliard'
+	DECLARE @BillionWords	NVARCHAR(20) = N'milliard'
+	DECLARE @TrillionWord	NVARCHAR(20) = N'billion'
+	DECLARE @TrillionWords	NVARCHAR(20) = N'billion'
 
 	-- decimal number	
-	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
-	DECLARE @vSubDecimalResult NVARCHAR(255)
-	IF @vDecimalNum <> 0
-		SET @vSubDecimalResult = dbo.MoneyToWords_DK(@vDecimalNum)
+	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
+	DECLARE @vLoop SMALLINT = CONVERT(SMALLINT, SQL_VARIANT_PROPERTY(@Number, 'Scale'))
+	DECLARE @vSubDecimalResult	NVARCHAR(MAX) = N''
+	IF @vDecimalNum > 0
+	BEGIN
+		WHILE @vLoop > 0
+		BEGIN
+			IF @vDecimalNum % 10 = 0
+				SET @vSubDecimalResult = FORMATMESSAGE('%s %s', @ZeroWord, @vSubDecimalResult)
+			ELSE
+				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
+				FROM	@tDict
+				WHERE	Num = @vDecimalNum%10
+
+			SET @vDecimalNum = FLOOR(@vDecimalNum/10)
+			SET @vLoop = @vLoop - 1
+		END
+	END
 	
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -66,28 +82,35 @@ BEGIN
 			IF @v000Num > 0
 			BEGIN 
 				--00
-				IF @v00Num < 10
+				IF @v00Num <= 20
 				BEGIN
-					-- less than 10
+					-- less than or equal 20
                     SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
 				END
 				ELSE 
 				BEGIN
-					-- greater than or equal 10
+					-- greater than 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
+					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s%s%s', @vSubResult, @AndWord, Nam)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
 				--000
 				IF @v000Num > 99
-					SELECT @vSubResult = FORMATMESSAGE('%s %s %s', CASE WHEN Num > 1 THEN Nam ELSE '' END, @HundredWord, @vSubResult) FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100)
+					IF @v000Num = 100 AND @vIndex = 0
+						SET @vSubResult = @HundredWord
+					ELSE
+						SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s %s %s', Nam, 
+																		CASE WHEN Num > 1 THEN @HundredWords ELSE @HundredWord END, 
+																		CASE WHEN @v00Num > 0 THEN @AndWord + N' ' + @vSubResult ELSE N'' END))
+						FROM	@tDict
+						WHERE	Num = CONVERT(INT,@v000Num / 100)
 			END
 			
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				IF @v000Num = 1 AND @vIndex = 1
-					SET @vSubResult = ''
+				IF @v000Num = 1 AND @vIndex = 1 AND @vPrev000Number % 1000 = 0
+					SET @vSubResult = 'et'
 
 				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
@@ -98,8 +121,11 @@ BEGIN
 																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
 																		ELSE ''
 																	END)
-
-				SET @vResult = FORMATMESSAGE('%s %s', LTRIM(@vSubResult), @vResult)
+				
+				IF @vIndex = 1 AND @vPrev000Number % 1000 > 0 AND @vPrev000Number % 1000 < 10
+					SET @vResult = FORMATMESSAGE('%s %s %s', LTRIM(@vSubResult), @AndWord, @vResult)
+				ELSE
+					SET @vResult = FORMATMESSAGE('%s %s', LTRIM(@vSubResult), @vResult)
 			END
 
 			-- next 000 (to left)
