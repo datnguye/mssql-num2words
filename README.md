@@ -1,12 +1,15 @@
 # mssql-num2words
 This is the TSQL container to help to convert money to words.
 
+![Alt text](icon.png?raw=true "mssql-num2words icon")
+
 #### Support Languages
 * Arabic (AR) - NOT 100% accurated
 * German (DE)
 * Danish (DK)
 * English (EN)
 * Spanish (ES)
+* Finnish (FI)
 * French (FR)
 * Italian (IT)
 * Japanese (JA)
@@ -24,7 +27,6 @@ TBU
 
 #### Road map
 * Czech (CZ)
-* Finnish (FI)
 * Hebrew (HE)
 * Hungarian (HU)
 * Indonesian (ID)
