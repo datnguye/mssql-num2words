@@ -1,5 +1,6 @@
 # mssql-num2words
 This is the TSQL container to help to convert money to words.
+![Alt text](icon.png?raw=true "mssql-num2words icon")
 
 #### Support Languages
 * Arabic (AR) - NOT 100% accurated
