@@ -14,6 +14,7 @@ AS
 BEGIN
 	RETURN CASE 
 		WHEN LOWER(@Lang)='ar' THEN dbo.MoneyToWords_AR(@Number)
+		WHEN LOWER(@Lang)='cz' THEN dbo.MoneyToWords_CZ(@Number)
 		WHEN LOWER(@Lang)='de' THEN dbo.MoneyToWords_DE(@Number)
 		WHEN LOWER(@Lang)='dk' THEN dbo.MoneyToWords_DK(@Number)
 		WHEN LOWER(@Lang)='es' THEN dbo.MoneyToWords_ES(@Number)
