@@ -21,33 +21,40 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N'jedna'),(2,N'dva'),(3,N'tři'),(4,N'čtyři'),(5,N'pět'),(6,N'šest'),(7,N'sedm'),(8,N'osm'),(9,N'devět'),
-			(11,N'jedenáct'),(12,N'dvanáct'),(13,N'třináct'),(14,N'čtrnáct'),(15,N'patnáct'),(16,N'šestnáct'),(17,N'sedmnáct'),(18,N'osmnáct'),(19,N'devatenáct'),
-			(10,N'deset'),(20,N'dvacet'),(30,N'třicet'),(40,N'čtyřicet'),(50,N'padesát'),(60,N'šedesát'),(70,N'sedmdesát'),(80,N'osmdesát'),(90,N'devadesát'),
-			(100,N'sto'),(200,N'dvě stě'),(300,N'tři sta'),(400,N'čtyři sta'),(500,N'pět set'),(600,N'šest set'),(700,N'sedm set'),(800,N'osm set'),(900,N'devět set')
+	VALUES	(1,N'หนึ่ง'),(2,N'สอง'),(3,N'สาม'),(4,N'สี่'),(5,N'ห้า'),(6,N'หก'),(7,N'เจ็ด'),(8,N'แปด'),(9,N'เก้า'),
+			(11,N'สิบเอ็ด'),(12,N'สิบสอง'),(13,N'สิบสาม'),(14,N'สิบสี่'),(15,N'สิบห้า'),(16,N'สิบหก'),(17,N'สิบเจ็ด'),(18,N'สิบแปด'),(19,N'สิบเก้า'),
+			(10,N'สิบ'),(20,N'ยี่สิบ'),(30,N'สามสิบ'),(40,N'สี่สิบ'),(50,N'ห้าสิบ'),(60,N'หกสิบ'),(70,N'เจ็ดสิบ'),(80,N'แปดสิบ'),(90,N'เก้าสิบ'),
+			(100,N'ร้อย'),(200,N'สองร้อย'),(300,N'ร้อย'),(400,N'ร้อย'),(500,N'ร้อย'),(600,N'ร้อย'),(700,N'ร้อย'),(800,N'ร้อย'),(900,N'ร้อย')
 
-	DECLARE @ZeroWord		NVARCHAR(20) = N'nula'
-	DECLARE @DotWord		NVARCHAR(20) = N'celá'
-	DECLARE @AndWord		NVARCHAR(20) = N''
-	DECLARE @HundredWord	NVARCHAR(20) = N'sto'
-	DECLARE @HundredWords	NVARCHAR(20) = N'sta'
-	DECLARE @ThousandWord	NVARCHAR(20) = N'tisíc'
-	DECLARE @ThousandWords	NVARCHAR(20) = N'tisíc'
-	DECLARE @MillionWord	NVARCHAR(20) = N'milión'
-	DECLARE @MillionWords	NVARCHAR(20) = N'miliony'
-	DECLARE @MillionWordss	NVARCHAR(20) = N'milionů'
-	DECLARE @BillionWord	NVARCHAR(20) = N'miliarda'
-	DECLARE @BillionWords	NVARCHAR(20) = N'miliardy'
-	DECLARE @BillionWordss	NVARCHAR(20) = N'miliard'
-	DECLARE @TrillionWord	NVARCHAR(20) = N'bilión'
-	DECLARE @TrillionWords	NVARCHAR(20) = N'biliony'
-	DECLARE @TrillionWordss	NVARCHAR(20) = N'bilionů'
+	DECLARE @ZeroWord				NVARCHAR(20) = N'ศูนย์'
+	DECLARE @OneOddWord				NVARCHAR(20) = N'เอ็ด'--between 11 and 91
+	DECLARE @DotWord				NVARCHAR(20) = N'จุดส'
+	DECLARE @AndWord				NVARCHAR(20) = N''
+	DECLARE @HundredWord			NVARCHAR(20) = N'ร้อย'
+	DECLARE @ThousandWord			NVARCHAR(20) = N'พัน'
+	DECLARE @TenThousandWord		NVARCHAR(20) = N'หมื่น'
+	DECLARE @HundredThousandWord	NVARCHAR(20) = N'แสน'
+	DECLARE @MillionWord			NVARCHAR(20) = N'ล้าน'
 
 	-- decimal number		
-	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
-	DECLARE @vSubDecimalResult NVARCHAR(255)
-	IF @vDecimalNum <> 0
-		SET @vSubDecimalResult = dbo.MoneyToWords_TH(@vDecimalNum)
+	DECLARE @vDecimalNum INT = (@Number - FLOOR(@Number)) * 100
+	DECLARE @vLoop SMALLINT = CONVERT(SMALLINT, SQL_VARIANT_PROPERTY(@Number, 'Scale'))
+	DECLARE @vSubDecimalResult	NVARCHAR(MAX) = N''
+	IF @vDecimalNum > 0
+	BEGIN
+		WHILE @vLoop > 0
+		BEGIN
+			IF @vDecimalNum % 10 = 0
+				SET @vSubDecimalResult = FORMATMESSAGE('%s%s', @ZeroWord, @vSubDecimalResult)
+			ELSE
+				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s%s', Nam, @vSubDecimalResult)
+				FROM	@tDict
+				WHERE	Num = @vDecimalNum%10
+
+			SET @vDecimalNum = FLOOR(@vDecimalNum/10)
+			SET @vLoop = @vLoop - 1
+		END
+	END
 	
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -81,12 +88,14 @@ BEGIN
 				BEGIN
 					-- greater than 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
+					IF @v00Num > 20 AND @v00Num <= 91 AND @v00Num%10 = 1
+						SET @vSubResult = @OneOddWord
+					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s%s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
 				--000
 				IF @v000Num > 99
-					SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult))
+					SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s%s', CASE WHEN Num > 1 THEN Nam ELSE N'' END, @vSubResult))
 					FROM	@tDict
 					WHERE	Num = CONVERT(INT,@v000Num / 100) * 100
 			END
@@ -94,37 +103,17 @@ BEGIN
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				IF @vIndex = 1 AND @v000Num = 1
-					SET @vSubResult = @ThousandWord
-				ELSE IF @vIndex = 2 AND @v000Num = 1
-					SET @vSubResult = @MillionWord
-				ELSE IF @vIndex = 3 AND @v000Num = 1
-					SET @vSubResult = @BillionWord
-				ELSE IF @vIndex = 4 AND @v000Num = 1
-					SET @vSubResult = @TrillionWord
+				IF @vIndex = 1 
+					--tbc
+					-- the words Ten-thousand and hundred-thousand are not compounds as they are in English
 				ELSE
 					SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																			WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END 
-																								+ CASE WHEN @v000Num%100 IN (2,3,4) THEN N'e' ELSE N'' END
-																			WHEN @vIndex=2 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @MillionWords
-																									WHEN @v000Num%100 > 4 THEN @MillionWordss
-																									ELSE @MillionWord 
-																								END
-																			WHEN @vIndex=3 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @BillionWords
-																									WHEN @v000Num%100 > 4 THEN @BillionWordss
-																									ELSE @BillionWord 
-																								END
-																			WHEN @vIndex=4 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @TrillionWords
-																									WHEN @v000Num%100 > 4 THEN @TrillionWordss
-																									ELSE @TrillionWord 
-																								END
+																			WHEN @vIndex=1 THEN @ThousandWord
+																			WHEN @vIndex=2 THEN @MillionWord
 																			ELSE N''
 																		END)
 				
-				SET @vResult = FORMATMESSAGE('%s %s', LTRIM(@vSubResult), @vResult)
+				SET @vResult = FORMATMESSAGE('%s%s', LTRIM(@vSubResult), @vResult)
 			END
 
 			-- next 000 (to left)
