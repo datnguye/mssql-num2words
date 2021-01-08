@@ -18,7 +18,7 @@ This is the TSQL container to help to convert money to words.
 * Polish (PL)
 * Portuguese (PT)
 * Russian (RU)
-* Thai (TH) - In developing...
+* Thai (TH)
 * Turkish (TR)
 * Vietnamese (VI)
 
