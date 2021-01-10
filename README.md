@@ -40,6 +40,7 @@ TBU
 * Telugu (TE)
 * Dutch (NL)
 * Ukrainian (UK)
+* Hindi (HI)
 
 
 ### Contacts
