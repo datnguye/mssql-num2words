@@ -36,11 +36,11 @@ TBU
 
 #### Road map
 * Serbian (SR)
-* Romanian (RO)
 * Telugu (TE)
 * Dutch (NL)
 * Ukrainian (UK)
 * Hindi (HI)
+* Irish (ga)
 
 
 ### Contacts
