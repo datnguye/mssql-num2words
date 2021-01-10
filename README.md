@@ -20,6 +20,7 @@ This is the TSQL container to help to convert money to words.
 * Kazakh (KZ)
 * Lithuanian (LT)
 * Latvian (LV)
+* Norwegian (NO)
 * Polish (PL)
 * Portuguese (PT)
 * Russian (RU)
@@ -33,7 +34,6 @@ TBU
 
 
 #### Road map
-* Norwegian (NO)
 * Slovene (SL)
 * Serbian (SR)
 * Romanian (RO)
