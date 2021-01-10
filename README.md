@@ -12,6 +12,7 @@ This is the TSQL container to help to convert money to words.
 * Spanish (ES)
 * Finnish (FI)
 * French (FR)
+* Hebrew (HE)
 * Italian (IT)
 * Japanese (JA)
 * Korean (KO)
@@ -28,7 +29,6 @@ TBU
 
 
 #### Road map
-* Hebrew (HE)
 * Hungarian (HU)
 * Indonesian (ID)
 * Kannada (KN)
