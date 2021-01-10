@@ -21,33 +21,31 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N'jedna'),(2,N'dva'),(3,N'tři'),(4,N'čtyři'),(5,N'pět'),(6,N'šest'),(7,N'sedm'),(8,N'osm'),(9,N'devět'),
-			(11,N'jedenáct'),(12,N'dvanáct'),(13,N'třináct'),(14,N'čtrnáct'),(15,N'patnáct'),(16,N'šestnáct'),(17,N'sedmnáct'),(18,N'osmnáct'),(19,N'devatenáct'),
-			(10,N'deset'),(20,N'dvacet'),(30,N'třicet'),(40,N'čtyřicet'),(50,N'padesát'),(60,N'šedesát'),(70,N'sedmdesát'),(80,N'osmdesát'),(90,N'devadesát'),
-			(100,N'sto'),(200,N'dvě stě'),(300,N'tři sta'),(400,N'čtyři sta'),(500,N'pět set'),(600,N'šest set'),(700,N'sedm set'),(800,N'osm set'),(900,N'devět set')
+	VALUES	(1,N'אַחַת'),(2,N'שְׁתַּיִם'),(3,N'שָׁלֹשׁ'),(4,N'אַרְבַּע'),(5,N'חָמֵשׁ'),(6,N'שֵׁשׁ'),(7,N'שֶׁבַע'),(8,N'שְׁמוֹנֶה'),(9,N'תֵּשַׁע'),
+			(11,N'אֲחַד-עָשָׂר'),(12,N'שְׁנֵים-עָשָׂר'),(13,N'שְׁלֹשָה-עָשָׂר'),(14,N'אַרְבָּעָה-עָשָׂר'),(15,N'חֲמִשָּׁה-עָשָׂר'),(16,N'שִׁשָּׁה-עָשָׂר'),(17,N'שִׁבְעָה-עָשָׂר'),(18,N'שְׁמוֹנָה-עָשָׂר'),(19,N'תִּשְׁעָה-עָשָׂר'),
+			(10,N'עֶשֶׂר'),(20,N'עֶשְׂרִים'),(30,N'שְׁלֹשִׁים'),(40,N'אַרְבָּעִים'),(50,N'חֲמִשִּׁים'),(60,N'שִׁשִּׁים'),(70,N'שִׁבְעִים'),(80,N'שְׁמוֹנִים'),(90,N'תִּשְׁעִים')
 
-	DECLARE @ZeroWord		NVARCHAR(20) = N'nula'
-	DECLARE @DotWord		NVARCHAR(20) = N'celá'
-	DECLARE @AndWord		NVARCHAR(20) = N''
-	DECLARE @HundredWord	NVARCHAR(20) = N'sto'
-	DECLARE @HundredWords	NVARCHAR(20) = N'sta'
-	DECLARE @ThousandWord	NVARCHAR(20) = N'tisíc'
-	DECLARE @ThousandWords	NVARCHAR(20) = N'tisíc'
-	DECLARE @MillionWord	NVARCHAR(20) = N'milión'
-	DECLARE @MillionWords	NVARCHAR(20) = N'miliony'
-	DECLARE @MillionWordss	NVARCHAR(20) = N'milionů'
-	DECLARE @BillionWord	NVARCHAR(20) = N'miliarda'
-	DECLARE @BillionWords	NVARCHAR(20) = N'miliardy'
-	DECLARE @BillionWordss	NVARCHAR(20) = N'miliard'
-	DECLARE @TrillionWord	NVARCHAR(20) = N'bilión'
-	DECLARE @TrillionWords	NVARCHAR(20) = N'biliony'
-	DECLARE @TrillionWordss	NVARCHAR(20) = N'bilionů'
-
+	DECLARE @ZeroWord			NVARCHAR(20) = N'אֶפֶס'
+	DECLARE @DotWord			NVARCHAR(20) = N''
+	DECLARE @AndWord			NVARCHAR(20) = N''
+	DECLARE @HundredWord		NVARCHAR(20) = N'מֵאָה'
+	DECLARE @2HundredWord		NVARCHAR(20) = N'מָאתַיִם'
+	DECLARE @HundredWords		NVARCHAR(20) = N'מֵאוֹת'
+	DECLARE @ThousandWord		NVARCHAR(20) = N'אֶלֶף'
+	DECLARE @2ThousandWord		NVARCHAR(20) = N'אֲלָפִים'
+	DECLARE @ThousandWords		NVARCHAR(20) = N'אֲלָפִים'
+	DECLARE @MillionWord		NVARCHAR(20) = N'מִילְיוֹן'
+	DECLARE @BillionWord		NVARCHAR(20) = N'מִילְיַרְדּ'
+	DECLARE @TrillionWord		NVARCHAR(20) = N'טְרִילְיוֹן'
+	DECLARE @QuadrillionWord	NVARCHAR(20) = N'קְוַדְרִילְיוֹן'
+	
+	-- ** NOT IMPLEMENT **
 	-- decimal number		
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
 	DECLARE @vSubDecimalResult NVARCHAR(255)
-	IF @vDecimalNum <> 0
-		SET @vSubDecimalResult = dbo.MoneyToWords_HE(@vDecimalNum)
+	--IF @vDecimalNum <> 0
+	--	SET @vSubDecimalResult = dbo.MoneyToWords_HE(@vDecimalNum)
+	-- ** NOT IMPLEMENT **
 	
 	-- main number
 	SET @Number = FLOOR(@Number)
@@ -60,7 +58,6 @@ BEGIN
 		DECLARE @v00Num DECIMAL(15,0) = 0
 		DECLARE @v0Num DECIMAL(15,0) = 0
 		DECLARE @vIndex SMALLINT = 0
-		DECLARE @vPrev000Number DECIMAL(17,2) = 0
 		
 		WHILE @Number > 0
 		BEGIN
@@ -80,47 +77,35 @@ BEGIN
 				ELSE 
 				BEGIN
 					-- greater than 20
-					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
+					SELECT @vSubResult = (CASE WHEN Num IN (2,8) THEN N'וּ' ELSE N'וָ' END)+Nam FROM @tDict WHERE Num = @v0Num 
+					SELECT @vSubResult = LTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
 				--000
 				IF @v000Num > 99
-					SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult))
+					SELECT	@vSubResult = CASE 
+											WHEN Num = 1 THEN RTRIM(FORMATMESSAGE('%s %s', @HundredWord, @vSubResult))
+											WHEN Num = 2 THEN RTRIM(FORMATMESSAGE('%s %s', @2HundredWord, @vSubResult))
+											ELSE RTRIM(FORMATMESSAGE('%s %s %s', Nam, @HundredWords, @vSubResult))
+										END
 					FROM	@tDict
-					WHERE	Num = CONVERT(INT,@v000Num / 100) * 100
+					WHERE	Num = CONVERT(INT,@v000Num / 100)
 			END
 			
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				IF @vIndex = 1 AND @v000Num = 1
+				IF @v000Num = 1 AND @vIndex = 1
 					SET @vSubResult = @ThousandWord
-				ELSE IF @vIndex = 2 AND @v000Num = 1
-					SET @vSubResult = @MillionWord
-				ELSE IF @vIndex = 3 AND @v000Num = 1
-					SET @vSubResult = @BillionWord
-				ELSE IF @vIndex = 4 AND @v000Num = 1
-					SET @vSubResult = @TrillionWord
+				ELSE IF @v000Num = 2 AND @vIndex = 1
+					SET @vSubResult = @2ThousandWord
 				ELSE
 					SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																			WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END 
-																								+ CASE WHEN @v000Num%100 IN (2,3,4) THEN N'e' ELSE N'' END
-																			WHEN @vIndex=2 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @MillionWords
-																									WHEN @v000Num%100 > 4 THEN @MillionWordss
-																									ELSE @MillionWord 
-																								END
-																			WHEN @vIndex=3 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @BillionWords
-																									WHEN @v000Num%100 > 4 THEN @BillionWordss
-																									ELSE @BillionWord 
-																								END
-																			WHEN @vIndex=4 THEN CASE 
-																									WHEN @v000Num%100 IN (2,3,4) THEN @TrillionWords
-																									WHEN @v000Num%100 > 4 THEN @TrillionWordss
-																									ELSE @TrillionWord 
-																								END
+																			WHEN @vIndex=1 THEN CASE WHEN @v000Num < 11 THEN @ThousandWords ELSE @ThousandWord END 
+																			WHEN @vIndex=2 THEN @MillionWord
+																			WHEN @vIndex=3 THEN @BillionWord
+																			WHEN @vIndex=4 THEN @TrillionWord
+																			WHEN @vIndex=5 THEN @QuadrillionWord
 																			ELSE N''
 																		END)
 				
@@ -129,7 +114,6 @@ BEGIN
 
 			-- next 000 (to left)
 			SET @vIndex = @vIndex + 1
-			SET @vPrev000Number = @Number
 			SET @Number = FLOOR(@Number / 1000)
 		END
 	END
@@ -140,19 +124,18 @@ BEGIN
     RETURN @vResult
 END
 /*	
-	SELECT dbo.MoneyToWords_HE(3201001.25)
-	SELECT dbo.MoneyToWords_HE(123456789.56)
-	SELECT dbo.MoneyToWords_HE(123000789.56)
-	SELECT dbo.MoneyToWords_HE(123010789.56)
-	SELECT dbo.MoneyToWords_HE(123004789.56)
-	SELECT dbo.MoneyToWords_HE(123904789.56)
-	SELECT dbo.MoneyToWords_HE(205.56)
-	SELECT dbo.MoneyToWords_HE(45.1)
-	SELECT dbo.MoneyToWords_HE(45.09)
-	SELECT dbo.MoneyToWords_HE(0.09)
-	SELECT dbo.MoneyToWords_HE(1234567896789.02)--1 234 567 896 789.02
-	SELECT dbo.MoneyToWords_HE(1234567896789.52)--1 234 567 896 789.52
-	SELECT dbo.MoneyToWords_HE(123234567896789.02)--123 234 567 896 789.02	
-	SELECT dbo.MoneyToWords_HE(999999999999999.99)--999 999 999 999 999.99	
+	SELECT dbo.MoneyToWords_HE(3201001)
+	SELECT dbo.MoneyToWords_HE(123456789)
+	SELECT dbo.MoneyToWords_HE(123000789)
+	SELECT dbo.MoneyToWords_HE(123010789)
+	SELECT dbo.MoneyToWords_HE(123004789)
+	SELECT dbo.MoneyToWords_HE(123904789)
+	SELECT dbo.MoneyToWords_HE(205)
+	SELECT dbo.MoneyToWords_HE(45.)
+	SELECT dbo.MoneyToWords_HE(0)
+	SELECT dbo.MoneyToWords_HE(1234567896789)--1 234 567 896 789
+	SELECT dbo.MoneyToWords_HE(1234567896789)--1 234 567 896 789
+	SELECT dbo.MoneyToWords_HE(123234567896789)--123 234 567 896 789
+	SELECT dbo.MoneyToWords_HE(999999999999999)--999 999 999 999 999
 	SELECT dbo.MoneyToWords_HE(100000000000000)
 */
