@@ -33,6 +33,7 @@ BEGIN
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PL(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PT(@Number)
 		WHEN LOWER(@Lang)='ru' THEN dbo.MoneyToWords_RU(@Number)
+		WHEN LOWER(@Lang)='sl' THEN dbo.MoneyToWords_SL(@Number)
 		WHEN LOWER(@Lang)='tr' THEN dbo.MoneyToWords_TR(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
 		ELSE dbo.MoneyToWords_EN(@Number)
