@@ -17,6 +17,7 @@ This is the TSQL container to help to convert money to words.
 * Italian (IT)
 * Japanese (JA)
 * Korean (KO)
+* Kazakh (KZ)
 * Polish (PL)
 * Portuguese (PT)
 * Russian (RU)
@@ -30,8 +31,6 @@ TBU
 
 
 #### Road map
-* Kannada (KN)
-* Kazakh (KZ)
 * Lithuanian (LT)
 * Latvian (LV)
 * Norwegian (NO)
