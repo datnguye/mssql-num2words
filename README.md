@@ -46,4 +46,4 @@ TBU
 ### Contacts
 Have a touch to us via emails: [Dat Nguyen](mailto:datnguyen.it09@gmail.com),  [Nam Vu](mailto:yvisvu@gmail.com)
 
-Or via the socials: [Facebook](https://www.facebook.com/mssqlnum2words)
+Or via the socials: [![Contact Us](https://i.pinimg.com/564x/d1/e0/6e/d1e06e9cc0b4c0880e99d7df775e5f7c.jpg?avatarHeight=72)](https://www.facebook.com/mssqlnum2words)
