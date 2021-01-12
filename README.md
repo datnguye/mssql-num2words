@@ -25,6 +25,7 @@ This is the TSQL container to help to convert money to words.
 * Portuguese (PT)
 * Russian (RU)
 * Slovene (SL)
+* Serbian (SR)
 * Thai (TH)
 * Turkish (TR)
 * Vietnamese (VI)
@@ -35,7 +36,6 @@ TBU
 
 
 #### Road map
-* Serbian (SR)
 * Telugu (TE)
 * Dutch (NL)
 * Ukrainian (UK)
