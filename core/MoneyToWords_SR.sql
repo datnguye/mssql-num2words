@@ -24,22 +24,25 @@ BEGIN
 	VALUES	(1,N'један'),(2,N'два'),(3,N'три'),(4,N'четири'),(5,N'пет'),(6,N'шест'),(7,N'седам'),(8,N'осам'),(9,N'девет'),
 			(11,N'једанаест'),(12,N'дванаест'),(13,N'тринаест'),(14,N'четрнаест'),(15,N'петнаест'),(16,N'шеснаест'),(17,N'седамнаест'),(18,N'осамнаест'),(19,N'деветнаест'),
 			(10,N'десет'),(20,N'двадесет'),(30,N'тридесет'),(40,N'четрдесет'),(50,N'педесет'),(60,N'шездесет'),(70,N'седамдесет'),(80,N'осамдесет'),(90,N'деведесет'),
-			--???(100,N'сто'),(200,N'двести'),(300,N'триста'),(400,N'четыреста'),(500,N'пятьсот'),(600,N'шестьсот'),(700,N'семьсот'),(800,N'восемьсот'),(900,N'девятьсот'),
+			(100,N'сто'),(200,N'двести'),(300,N'триста'),(400,N'четыреста'),(500,N'пятьсот'),(600,N'шестьсот'),(700,N'семьсот'),(800,N'восемьсот'),(900,N'девятьсот')
 			--(1000,N'тысяча'),(2000,N'две тысячи'),(3000,N'три тысячи'),(4000,N'четыре тысячи')
 
 	DECLARE @ZeroWord		NVARCHAR(20) = N'нула'
 	DECLARE @DotWord		NVARCHAR(20) = N'поен'
-	DECLARE @AndWord		NVARCHAR(20) = N''
+	DECLARE @AndWord		NVARCHAR(20) = N'и'
 	DECLARE @HundredWord	NVARCHAR(20) = N'сто'
+	DECLARE @HundredWordx	NVARCHAR(20) = N'ста'--2,3
 	DECLARE @HundredWords	NVARCHAR(20) = N'сто'
 	DECLARE @ThousandWord	NVARCHAR(20) = N'хиљада'
+	DECLARE @ThousandWordx	NVARCHAR(20) = N'хиљаде'--2,3,4
 	DECLARE @ThousandWords	NVARCHAR(20) = N'хиљада'
 	DECLARE @MillionWord	NVARCHAR(20) = N'милион'
-	DECLARE @MillionWords	NVARCHAR(20) = N'милион'
+	DECLARE @MillionWords	NVARCHAR(20) = N'милиона'
 	DECLARE @BillionWord	NVARCHAR(20) = N'милијарда'
-	DECLARE @BillionWords	NVARCHAR(20) = N'милијарда'
+	DECLARE @BillionWordx	NVARCHAR(20) = N'милијарде'--2,3,4
+	DECLARE @BillionWords	NVARCHAR(20) = N'милијарди'
 	DECLARE @TrillionWord	NVARCHAR(20) = N'билион'
-	DECLARE @TrillionWords	NVARCHAR(20) = N'билион'
+	DECLARE @TrillionWords	NVARCHAR(20) = N'билиона'
 
 	-- decimal number		
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
@@ -79,43 +82,37 @@ BEGIN
 				BEGIN
 					-- greater than 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
+					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s %s', Nam, @AndWord, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
 				--000
 				IF @v000Num > 99
-					SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult))
+					SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s%s %s', 
+														CASE WHEN Num>1 THEN Nam ELSE N'' END,
+														CASE WHEN Num=1 THEN @HundredWord WHEN Num IN (2) THEN N' '+@HundredWord WHEN Num IN (3) THEN @HundredWordx ELSE @HundredWords END,
+														@vSubResult))
 					FROM	@tDict
-					WHERE	Num = CONVERT(INT,@v000Num / 100) * 100
+					WHERE	Num = CONVERT(INT,@v000Num / 100)
 			END
 			
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				IF @vIndex%3=1 AND @v000Num%1000 = 1
-					SELECT	@vSubResult = Nam
-					FROM	@tDict
-					WHERE	Num = @v000Num%1000 * 1000
-				ELSE IF @vIndex%3=1 AND @v000Num%10 IN (2,3,4)
-					SET @vSubResult = LTRIM(FORMATMESSAGE('%s%s%s',
-														COALESCE((SELECT Nam+N' ' FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100) * 100),N''),
-														COALESCE((SELECT Nam+N' ' FROM @tDict WHERE Num = CONVERT(INT,@v00Num / 10) * 10),N''),
-														(SELECT Nam FROM @tDict WHERE Num = @v000Num%10*1000)))
-				ELSE
-					SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																			WHEN @vIndex=0 THEN N''
-																			WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
-																			WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
-																			WHEN @vIndex=3 THEN CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
-																			WHEN @vIndex>3 AND @vIndex%3=2 THEN (CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END) + ' ' + TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
-																			WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
-																			ELSE @ThousandWords
-																		END)
+				IF @vIndex=1 AND @v000Num=1
+					SET @vSubResult = N''
+
+				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
+																		WHEN @vIndex=1 THEN CASE WHEN @v000Num=1 THEN @ThousandWord WHEN @v000Num IN (2,3,4) THEN @ThousandWordx ELSE @ThousandWords END
+																		WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
+																		WHEN @vIndex=3 THEN CASE WHEN @v000Num=1 THEN @BillionWord WHEN @v000Num IN (2,3,4) THEN @BillionWordx ELSE @BillionWords END
+																		WHEN @vIndex=4 THEN CASE WHEN @v000Num > 1 THEN @TrillionWords ELSE @TrillionWord END
+																		ELSE N''
+																	END)
 				
-				IF @vIndex = 0 OR (@vIndex = 1 AND @vPrev000Number%1000 < 100 AND @vPrev000Number%1000 > 0) OR @vResult = ''
-					SET @vResult = FORMATMESSAGE('%s %s', LTRIM(@vSubResult), @vResult)
-				ELSE
-					SET @vResult = FORMATMESSAGE('%s, %s', LTRIM(@vSubResult), @vResult)
+				IF (@vIndex = 1 AND @vPrev000Number%1000 < 100) OR @vResult = ''
+					SET @vResult = RTRIM(FORMATMESSAGE('%s %s', @vSubResult, @vResult))
+				ELSE 
+					SET @vResult = FORMATMESSAGE('%s, %s', @vSubResult, @vResult)
 			END
 
 			-- next 000 (to left)

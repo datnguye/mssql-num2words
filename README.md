@@ -41,6 +41,7 @@ TBU
 * Ukrainian (UK)
 * Hindi (HI)
 * Irish (ga)
+* Arabic (AR) - Redo
 
 
 ### Contacts
