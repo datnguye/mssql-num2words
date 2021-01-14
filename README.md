@@ -29,6 +29,7 @@ This is the TSQL container to help to convert money to words.
 * Telugu (TE)
 * Thai (TH)
 * Turkish (TR)
+* Ukrainian (UK)
 * Vietnamese (VI)
 
 
@@ -38,7 +39,6 @@ TBU
 
 #### Road map
 * Dutch (NL)
-* Ukrainian (UK)
 * Hindi (HI)
 * Irish (ga)
 * Arabic (AR) - Redo
