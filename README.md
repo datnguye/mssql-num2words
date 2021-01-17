@@ -13,7 +13,7 @@ So by the end, it will do:
 * TESTED in SQL SERVER 2019, but WILL WORK for THE OLDERS too
 
 ## Support Languages
-* Arabic (AR) - NOT 100% accurated
+* Arabic (AR)
 * Czech (CZ)
 * German (DE)
 * Danish (DK)
@@ -50,7 +50,6 @@ TBU
 
 ## Road map
 * Dutch (NL)
-* Arabic (AR) - Redo
 
 
 ## Contacts
