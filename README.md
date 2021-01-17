@@ -21,6 +21,7 @@ So by the end, it will do:
 * Spanish (ES)
 * Finnish (FI)
 * French (FR)
+* Irish (GA)
 * Hebrew (HE)
 * Indonesian (ID)
 * Italian (IT)
@@ -49,7 +50,6 @@ TBU
 ## Road map
 * Dutch (NL)
 * Hindi (HI)
-* Irish (ga)
 * Arabic (AR) - Redo
 
 
