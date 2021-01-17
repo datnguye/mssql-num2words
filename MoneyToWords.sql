@@ -22,6 +22,7 @@ BEGIN
 		WHEN LOWER(@Lang)='fr' THEN dbo.MoneyToWords_FR(@Number)
 		WHEN LOWER(@Lang)='ga' THEN dbo.MoneyToWords_GA(@Number)
 		WHEN LOWER(@Lang)='he' THEN dbo.MoneyToWords_HE(@Number)
+		WHEN LOWER(@Lang)='hi' THEN dbo.MoneyToWords_HI(@Number)
 		WHEN LOWER(@Lang)='id' THEN dbo.MoneyToWords_ID(@Number)
 		WHEN LOWER(@Lang)='th' THEN dbo.MoneyToWords_TH(@Number)
 		WHEN LOWER(@Lang)='it' THEN dbo.MoneyToWords_IT(@Number)

@@ -23,6 +23,7 @@ So by the end, it will do:
 * French (FR)
 * Irish (GA)
 * Hebrew (HE)
+* Hindi (HI)
 * Indonesian (ID)
 * Italian (IT)
 * Japanese (JA)
@@ -49,7 +50,6 @@ TBU
 
 ## Road map
 * Dutch (NL)
-* Hindi (HI)
 * Arabic (AR) - Redo
 
 
