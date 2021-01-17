@@ -70,7 +70,7 @@ BEGIN
 			END
 
 			SET @vSubResult = ''
-			IF @v000Num > 0
+			IF @v000Num > 0 OR (@vIndex >= 1 AND @v00Num > 0)
 			BEGIN 
 				--00
 				IF @v00Num <= 20
