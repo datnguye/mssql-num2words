@@ -37,6 +37,7 @@ BEGIN
 		WHEN LOWER(@Lang)='sr' THEN dbo.MoneyToWords_SR(@Number)
 		WHEN LOWER(@Lang)='te' THEN dbo.MoneyToWords_TE(@Number)
 		WHEN LOWER(@Lang)='tr' THEN dbo.MoneyToWords_TR(@Number)
+		WHEN LOWER(@Lang)='uk' THEN dbo.MoneyToWords_UK(@Number)
 		WHEN LOWER(@Lang)='vi' THEN dbo.MoneyToWords_VI(@Number)
 		ELSE dbo.MoneyToWords_EN(@Number)
 	END		
