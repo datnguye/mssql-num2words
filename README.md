@@ -12,7 +12,7 @@ So by the end, it will do:
 * NOT Machine Learning, ONLY the ALGORITHM
 * TESTED in SQL SERVER 2019, but WILL WORK for THE OLDERS too
 
-#### Support Languages
+## Support Languages
 * Arabic (AR) - NOT 100% accurated
 * Czech (CZ)
 * German (DE)
@@ -42,18 +42,18 @@ So by the end, it will do:
 * Vietnamese (VI)
 
 
-#### Installaton
+## Installaton
 TBU
 
 
-#### Road map
+## Road map
 * Dutch (NL)
 * Hindi (HI)
 * Irish (ga)
 * Arabic (AR) - Redo
 
 
-### Contacts
+## Contacts
 Have a touch to us via emails: [Dat Nguyen](mailto:datnguyen.it09@gmail.com),  [Nam Vu](mailto:yvisvu@gmail.com)
 
 Or via the socials: [Facebook](https://www.facebook.com/mssqlnum2words)
