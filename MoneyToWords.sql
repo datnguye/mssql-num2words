@@ -5,6 +5,7 @@
 -- History:
 -- Date			Author		Description
 -- 2020-09-05	DN			Intial
+-- 2021-01-17	DN			Finished 30 languages
 --======================================================
 DROP FUNCTION IF EXISTS MoneyToWords
 GO
@@ -31,6 +32,7 @@ BEGIN
 		WHEN LOWER(@Lang)='kz' THEN dbo.MoneyToWords_KZ(@Number)
 		WHEN LOWER(@Lang)='lt' THEN dbo.MoneyToWords_LT(@Number)
 		WHEN LOWER(@Lang)='lv' THEN dbo.MoneyToWords_LV(@Number)
+		WHEN LOWER(@Lang)='nl' THEN dbo.MoneyToWords_NL(@Number)
 		WHEN LOWER(@Lang)='no' THEN dbo.MoneyToWords_NO(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PL(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PT(@Number)

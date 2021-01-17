@@ -31,6 +31,7 @@ So by the end, it will do:
 * Kazakh (KZ)
 * Lithuanian (LT)
 * Latvian (LV)
+* Dutch (NL)
 * Norwegian (NO)
 * Polish (PL)
 * Portuguese (PT)
@@ -46,10 +47,6 @@ So by the end, it will do:
 
 ## Installaton
 TBU
-
-
-## Road map
-* Dutch (NL)
 
 
 ## Contacts
