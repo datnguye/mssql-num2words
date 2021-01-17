@@ -21,23 +21,26 @@ BEGIN
 	DECLARE @tDict		TABLE (Num INT NOT NULL, Nam NVARCHAR(255) NOT NULL)
 	INSERT 
 	INTO	@tDict (Num, Nam)
-	VALUES	(1,N'один'),(2,N'две'),(3,N'три'),(4,N'четыре'),(5,N'пять'),(6,N'шесть'),(7,N'семь'),(8,N'восемь'),(9,N'девять'),
-			(11,N'одиннадцать'),(12,N'двенадцать'),(13,N'тринадцать'),(14,N'четырнадцать'),(15,N'пятнадцать'),(16,N'шестнадцать'),(17,N'семнадцать'),(18,N'восемнадцать'),(19,N'девятнадцать'),
-			(10,N'десять'),(20,N'двадцать'),(30,N'тридцать'),(40,N'сорок'),(50,N'пятьдесят'),(60,N'шестьдесят'),(70,N'семьдесят'),(80,N'восемьдесят'),(90,N'девяносто'),
-			(100,N'сто'),(200,N'двести'),(300,N'триста'),(400,N'четыреста'),(500,N'пятьсот'),(600,N'шестьсот'),(700,N'семьсот'),(800,N'восемьсот'),(900,N'девятьсот'),
-			(1000,N'тысяча'),(2000,N'две тысячи'),(3000,N'три тысячи'),(4000,N'четыре тысячи')
+	VALUES	(1,N'один'),(2,N'два'),(3,N'три'),(4,N'чотири'),(5,N'п’ять'),(6,N'шість'),(7,N'сім'),(8,N'вісім'),(9,N'дев’ять'),
+			(11,N'одинадцять'),(12,N'дванадцять'),(13,N'тринадцять'),(14,N'чотирнадцять'),(15,N'п’ятнадцять'),(16,N'шістнадцять'),(17,N'сімнадцять'),(18,N'вісімнадцять'),(19,N'дев’ятнадцять'),
+			(10,N'десять'),(20,N'двадцять'),(30,N'тридцять'),(40,N'сорок'),(50,N'п’ятдесят'),(60,N'шістдесят'),(70,N'сімдесят'),(80,N'вісімдесят'),(90,N'дев’яносто'),
+			(100,N'сто'),(200,N'двісті'),(300,N'триста'),(400,N'чотириста'),(500,N'п’ятсот'),(600,N'шістсот'),(700,N'сімсот'),(800,N'вісімсот'),(900,N'дев’ятсот')
 
-	DECLARE @ZeroWord		NVARCHAR(20) = N''
-	DECLARE @DotWord		NVARCHAR(20) = N''
+	DECLARE @ZeroWord		NVARCHAR(20) = N'нуль'
+	DECLARE @DotWord		NVARCHAR(20) = N'кома'
 	DECLARE @AndWord		NVARCHAR(20) = N''
-	DECLARE @HundredWord	NVARCHAR(20) = N''
-	DECLARE @HundredWords	NVARCHAR(20) = N''
-	DECLARE @ThousandWord	NVARCHAR(20) = N''
-	DECLARE @ThousandWords	NVARCHAR(20) = N''
-	DECLARE @MillionWord	NVARCHAR(20) = N''
-	DECLARE @MillionWords	NVARCHAR(20) = N''
-	DECLARE @BillionWord	NVARCHAR(20) = N''
-	DECLARE @BillionWords	NVARCHAR(20) = N''
+	DECLARE @TwoWordx		NVARCHAR(20) = N'дві'
+	--DECLARE @HundredWord	NVARCHAR(20) = N'сто'
+	--DECLARE @HundredWords	NVARCHAR(20) = N'сто'
+	DECLARE @ThousandWord	NVARCHAR(20) = N'тисяча'
+	DECLARE @ThousandWordx	NVARCHAR(20) = N'тисячі'--2,3,4
+	DECLARE @ThousandWords	NVARCHAR(20) = N'тисяч'
+	DECLARE @MillionWord	NVARCHAR(20) = N'мільйон'
+	DECLARE @MillionWords	NVARCHAR(20) = N'мільйон'
+	DECLARE @BillionWord	NVARCHAR(20) = N'мільярд'
+	DECLARE @BillionWords	NVARCHAR(20) = N'мільярд'
+	DECLARE @TrillionWord	NVARCHAR(20) = N'трильйон'
+	DECLARE @TrillionWords	NVARCHAR(20) = N'трильйон'
 
 	-- decimal number		
 	DECLARE @vDecimalNum DECIMAL(17,2) = (@Number - FLOOR(@Number)) * 100
@@ -71,12 +74,12 @@ BEGIN
 				IF @v00Num <= 20
 				BEGIN
 					-- less than or equal 20
-                    SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v00Num
+                    SELECT @vSubResult = (CASE WHEN @vIndex>=1 AND Num=2 THEN @TwoWordx ELSE Nam END) FROM @tDict WHERE Num = @v00Num
 				END
 				ELSE 
 				BEGIN
 					-- greater than 20
-					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
+					SELECT @vSubResult = (CASE WHEN @vIndex>=1 AND Num=2 THEN @TwoWordx ELSE Nam END) FROM @tDict WHERE Num = @v0Num 
 					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s %s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
@@ -90,27 +93,15 @@ BEGIN
 			--000xxx
 			IF @vSubResult <> ''
 			BEGIN
-				IF @vIndex%3=1 AND @v000Num%1000 = 1
-					SELECT	@vSubResult = Nam
-					FROM	@tDict
-					WHERE	Num = @v000Num%1000 * 1000
-				ELSE IF @vIndex%3=1 AND @v000Num%10 IN (2,3,4)
-					SET @vSubResult = LTRIM(FORMATMESSAGE('%s%s%s',
-														COALESCE((SELECT Nam+N' ' FROM @tDict WHERE Num = CONVERT(INT,@v000Num / 100) * 100),N''),
-														COALESCE((SELECT Nam+N' ' FROM @tDict WHERE Num = CONVERT(INT,@v00Num / 10) * 10),N''),
-														(SELECT Nam FROM @tDict WHERE Num = @v000Num%10*1000)))
-				ELSE
-					SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
-																			WHEN @vIndex=0 THEN N''
-																			WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
-																			WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
-																			WHEN @vIndex=3 THEN CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
-																			WHEN @vIndex>3 AND @vIndex%3=2 THEN (CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END) + ' ' + TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
-																			WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
-																			ELSE @ThousandWords
-																		END)
+				SET @vSubResult = FORMATMESSAGE('%s %s', @vSubResult, CASE 
+																		WHEN @vIndex=1 THEN CASE WHEN @v000Num=1 THEN @ThousandWord WHEN @v000Num%10 IN (2,3,4) THEN @ThousandWordx ELSE @ThousandWords END
+																		WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
+																		WHEN @vIndex=3 THEN CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
+																		WHEN @vIndex=4 THEN CASE WHEN @v000Num > 1 THEN @TrillionWords ELSE @TrillionWord END
+																		ELSE N''
+																	END)
 				
-				IF @vIndex = 0 OR (@vIndex = 1 AND @vPrev000Number%1000 < 100 AND @vPrev000Number%1000 > 0) OR @vResult = ''
+				IF (@vIndex = 1 AND @vPrev000Number%1000 < 100 AND @vPrev000Number%1000 > 0) OR @vResult = N''
 					SET @vResult = FORMATMESSAGE('%s %s', LTRIM(@vSubResult), @vResult)
 				ELSE
 					SET @vResult = FORMATMESSAGE('%s, %s', LTRIM(@vSubResult), @vResult)
@@ -141,7 +132,7 @@ END
 	SELECT dbo.MoneyToWords_UK(0.09)
 	SELECT dbo.MoneyToWords_UK(1234567896789.02)--1 234 567 896 789.02
 	SELECT dbo.MoneyToWords_UK(1234567896789.52)--1 234 567 896 789.52
-	SELECT dbo.MoneyToWords_UK(123234567896789.02)--123 234 567 896 789.02	
-	SELECT dbo.MoneyToWords_UK(999999999999999.99)--999 999 999 999 999.99	
+	SELECT dbo.MoneyToWords_UK(123234567896789.02)--123 234 567 896 789.02
+	SELECT dbo.MoneyToWords_UK(999999999999999.99)--999 999 999 999 999.99
 	SELECT dbo.MoneyToWords_UK(100000000000000)
 */
