@@ -48,9 +48,9 @@ BEGIN
 		WHILE @vLoop > 0
 		BEGIN
 			IF @vDecimalNum % 10 = 0
-				SET @vSubDecimalResult = FORMATMESSAGE('%s %s', @ZeroWord, @vSubDecimalResult)
+				SET @vSubDecimalResult = FORMATMESSAGE(N'%s %s', @ZeroWord, @vSubDecimalResult)
 			ELSE
-				SELECT	@vSubDecimalResult = FORMATMESSAGE('%s %s', Nam, @vSubDecimalResult)
+				SELECT	@vSubDecimalResult = FORMATMESSAGE(N'%s %s', Nam, @vSubDecimalResult)
 				FROM	@tDict
 				WHERE	Num = @vDecimalNum%10
 
@@ -65,7 +65,7 @@ BEGIN
 		SET @vResult = @ZeroWord
 	ELSE
 	BEGIN
-		DECLARE @vSubResult	NVARCHAR(MAX) = ''
+		DECLARE @vSubResult	NVARCHAR(MAX) = N''
 		DECLARE @v000Num DECIMAL(15,0) = 0
 		DECLARE @v00Num DECIMAL(15,0) = 0
 		DECLARE @v0Num DECIMAL(15,0) = 0
@@ -91,15 +91,15 @@ BEGIN
 				BEGIN
 					-- greater than 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
-					SELECT @vSubResult = RTRIM(FORMATMESSAGE('%s%s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
+					SELECT @vSubResult = RTRIM(FORMATMESSAGE(N'%s%s', Nam, @vSubResult)) FROM @tDict WHERE Num = FLOOR(@v00Num/10)*10
 				END
 
 				--000
 				IF @v000Num > 99
 					IF @v000Num < 200
-						SET @vSubResult = FORMATMESSAGE('%s%s', @HundredWord, @vSubResult)
+						SET @vSubResult = FORMATMESSAGE(N'%s%s', @HundredWord, @vSubResult)
 					ELSE
-						SELECT	@vSubResult = RTRIM(FORMATMESSAGE('%s%s%s', Nam, @HundredWords, @vSubResult))
+						SELECT	@vSubResult = RTRIM(FORMATMESSAGE(N'%s%s%s', Nam, @HundredWords, @vSubResult))
 						FROM	@tDict
 						WHERE	Num = CONVERT(INT,@v000Num / 100)
 			END
@@ -110,17 +110,17 @@ BEGIN
 				IF @v000Num = 1 AND @vIndex = 1 AND @vPrev000Number % 1000 = 0
 					SET @vSubResult = N''
 
-				SET @vSubResult = FORMATMESSAGE('%s%s', @vSubResult, CASE 
+				SET @vSubResult = FORMATMESSAGE(N'%s%s', @vSubResult, CASE 
 																		WHEN @vIndex=1 THEN CASE WHEN @v000Num > 1 THEN @ThousandWords ELSE @ThousandWord END
 																		WHEN @vIndex=2 THEN CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END
 																		WHEN @vIndex=3 THEN CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END
 																		WHEN @vIndex=4 THEN CASE WHEN @v000Num > 1 THEN @TrillionWords ELSE @TrillionWord END
-																		WHEN @vIndex>3 AND @vIndex%3=2 THEN (CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END) + ' ' + TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
-																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + ' ',@vIndex%3))
+																		WHEN @vIndex>3 AND @vIndex%3=2 THEN (CASE WHEN @v000Num > 1 THEN @MillionWords ELSE @MillionWord END) + N' ' + TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + N' ',@vIndex%3))
+																		WHEN @vIndex>3 AND @vIndex%3=0 THEN TRIM(REPLICATE((CASE WHEN @v000Num > 1 THEN @BillionWords ELSE @BillionWord END) + N' ',@vIndex%3))
 																		ELSE ''
 																	END)
 				
-				SET @vResult = FORMATMESSAGE('%s%s', LTRIM(@vSubResult), @vResult)
+				SET @vResult = FORMATMESSAGE(N'%s%s', LTRIM(@vSubResult), @vResult)
 			END
 
 			-- next 000 (to left)
@@ -130,7 +130,7 @@ BEGIN
 		END
 	END
 
-	SET @vResult = FORMATMESSAGE('%s %s', TRIM(@vResult), COALESCE(@DotWord + ' ' + NULLIF(@vSubDecimalResult,''), ''))
+	SET @vResult = FORMATMESSAGE(N'%s %s', TRIM(@vResult), COALESCE(@DotWord + N' ' + NULLIF(@vSubDecimalResult,N''), N''))
 	
 	-- result
     RETURN @vResult

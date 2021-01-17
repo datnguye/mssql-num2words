@@ -34,7 +34,7 @@ BEGIN
 		WHEN LOWER(@Lang)='lv' THEN dbo.MoneyToWords_LV(@Number)
 		WHEN LOWER(@Lang)='nl' THEN dbo.MoneyToWords_NL(@Number)
 		WHEN LOWER(@Lang)='no' THEN dbo.MoneyToWords_NO(@Number)
-		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PL(@Number)
+		WHEN LOWER(@Lang)='pl' THEN dbo.MoneyToWords_PL(@Number)
 		WHEN LOWER(@Lang)='pt' THEN dbo.MoneyToWords_PT(@Number)
 		WHEN LOWER(@Lang)='ru' THEN dbo.MoneyToWords_RU(@Number)
 		WHEN LOWER(@Lang)='sl' THEN dbo.MoneyToWords_SL(@Number)
