@@ -87,7 +87,7 @@ BEGIN
 					-- greater than or equal 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
 					SET @v00Num = FLOOR(@v00Num/10)*10
-					SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
+					SELECT @vSubResult = FORMATMESSAGE('%s%s', Nam, COALESCE('-' + NULLIF(@vSubResult, ''), '')) FROM @tDict WHERE Num = @v00Num 
 				END
 
 				--000
