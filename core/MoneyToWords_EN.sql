@@ -71,11 +71,8 @@ BEGIN
 			SET @v000Num = @Number % 1000
 			SET @v00Num = @v000Num % 100
 			SET @v0Num = @v00Num % 10
-			IF @v000Num = 0
-			BEGIN
-				SET @vSubResult = ''
-			END
-			ELSE 
+			SET @vSubResult = ''
+			IF @v000Num > 0
 			BEGIN 
 				--00
 				IF @v00Num < 20
@@ -90,7 +87,7 @@ BEGIN
 					-- greater than or equal 20
 					SELECT @vSubResult = Nam FROM @tDict WHERE Num = @v0Num 
 					SET @v00Num = FLOOR(@v00Num/10)*10
-					SELECT @vSubResult = FORMATMESSAGE('%s-%s', Nam, @vSubResult) FROM @tDict WHERE Num = @v00Num 
+					SELECT @vSubResult = FORMATMESSAGE('%s%s', Nam, COALESCE('-' + NULLIF(@vSubResult, ''), '')) FROM @tDict WHERE Num = @v00Num 
 				END
 
 				--000
@@ -142,4 +139,5 @@ END
 	SELECT dbo.MoneyToWords_EN(123234567896789.02)--123 234 567 896 789.02
 	SELECT dbo.MoneyToWords_EN(999999999999999.99)--999 999 999 999 999.99	
 	SELECT dbo.MoneyToWords_EN(100000000000000)
+    SELECT dbo.MoneyToWords_EN(20200.01)
 */
