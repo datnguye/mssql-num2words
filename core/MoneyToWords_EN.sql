@@ -3,9 +3,10 @@
 -- Notes:	It DOES NOT support negative number.
 --			Please concat 'negative word' into the result in that case
 -- History:
--- Date			Author		Description
--- 2020-09-16	NV			Intial
--- 2020-12-07	DN			Fix odd number
+-- Date			Author			Description
+-- 2020-09-16	NV				Intial
+-- 2020-12-07	DN				Fix odd number
+-- 2022-10-30	@eseinbinder	Fix #33 #34 / new test case of 20200.01
 --======================================================
 DROP FUNCTION IF EXISTS MoneyToWords_EN
 GO
